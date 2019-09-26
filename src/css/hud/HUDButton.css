@@ -1,0 +1,44 @@
+/* HUD Button Styles */
+
+/* Main Menu Buttons */
+.hud-button-small {
+    width: 30vw;
+    border-radius: 0.2vw;
+    font-size: 1.35vw;
+    margin-top: 0.5vw;
+    border-left: inset 10px;
+    border-bottom: solid 10px;
+    border-right: none;
+    border-top: none;
+    height: 6vw;
+    border-color: darkred;
+    background-color: #d95763;
+}
+
+.hud-button-enter {
+    width: 15%;
+    height: 3vw;
+    margin: 0.8vw;
+    padding: 0;
+    border-radius: 10px;
+    border: solid 2px darkgray;
+    outline: none;
+    transition: 0.2s all;
+}
+
+.hud-button-enter:hover {
+
+}
+
+/* Generic button style */
+.hud-button {
+    cursor: pointer;
+    transition: all 0.4s;
+}
+
+.hud-button-small:hover {
+    border-bottom: solid 4px;
+    border-left: solid 4px;
+    margin-top: 1.5vw;
+    height: 5vw;
+}

@@ -1,0 +1,42 @@
+.song-li-container {
+    height: 10vw;
+    width: 80%;
+    transition: all 0.3s;
+    margin: 0 auto 0.8vw auto;
+    cursor: pointer;
+    border: transparent solid 2px;
+    border-radius: 10px;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+}
+
+.song-li-container:hover {
+    border: black solid 2px;
+}
+
+/* It's important that all of these elements here can be
+ * applied to other versions of the song container
+ */
+.song-data-container {
+    height: 80%;
+    margin-left: 1.5vw;
+}
+
+.song-image {
+    height: 80%;
+    width: auto;
+    margin-left: 0.8vw;
+}
+
+.song-name {
+    font-size: 1.8vw;
+    white-space: nowrap;
+}
+
+.song-artist {
+    font-size: 1.2vw;
+    white-space: nowrap;
+}

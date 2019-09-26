@@ -4,11 +4,13 @@
   "private": true,
   "proxy": "http://localhost:8080",
   "dependencies": {
+    "dot-prop": "^5.1.0",
     "from-cdn": "^1.0.1",
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-router": "^5.0.1",
     "react-scripts": "3.1.1",
+    "rxjs": "5.5.12",
     "tune-mountain-input-manager": "github:calemdar/tune-mountain-input#master"
   },
   "scripts": {
@@ -34,6 +36,7 @@
   },
   "devDependencies": {
     "eslint": "^6.4.0",
-    "eslint-plugin-react": "^7.14.3"
+    "eslint-plugin-react": "^7.14.3",
+    "prop-types": "latest"
   }
 }

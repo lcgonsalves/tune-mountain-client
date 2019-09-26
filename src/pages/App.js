@@ -1,9 +1,9 @@
 import React, {Component} from "react";
-import UserProfile from "../components/UserProfile";
-import SpotifyService from '../utils/SpotifyService';
-import querystring from 'querystring';
+import HUDMainMenu from "./hud/HUDMainMenu";
+import SpotifyService from "../utils/SpotifyService";
+import HUDSongSearchMenu from "./hud/HUDSongSearchMenu";
 
-const DEBUG_URL = 'http://localhost:8080';
+const APP_NAME = "Tune Mountain";
 
 class App extends Component {
 
@@ -11,80 +11,37 @@ class App extends Component {
 
 		super(props);
 
+		const spotifyService = new SpotifyService(`${APP_NAME} Web Player`);
+		const hasLoggedIn = false;
+		spotifyService.stateNotifier.subscribe(state => console.log(state));
+		spotifyService.stateNotifier
+			.filter(notification => notification.state === "LOGGED_IN")
+			.subscribe(() => this.setState({"hasLoggedIn": true}));
+
+		// init player when sdk is ready
+
+		this.spotifyService = spotifyService;
+
 		this.state = {
-			'userProfile': null,
-			'userToken': null,
-			'refreshToken': null,
-			'spotifyService': null
+			hasLoggedIn,
+			"currentMenu": null
 		};
 
 	}
 
 	componentDidMount() {
 
-		const urlParams = new URLSearchParams(window.location.search);
-		console.log(urlParams);
-
-		if (urlParams.has('accessToken')) {
-			fetch(`${DEBUG_URL}/spotify-service/user-information/${urlParams.get('accessToken')}`)
-				.then(response => response.json())
-				.then(userJSON => {
-
-					const {
-						country,
-						display_name,
-						email,
-						id,
-						images,
-						uri
-					} = userJSON;
-
-					const user =
-						<UserProfile
-							displayName={display_name}
-							country={country}
-							email={email}
-							id={id}
-							uri={uri}
-							profilePictureUrl={images[0].url}
-							accessToken={urlParams.get('accessToken')}
-							refreshToken={urlParams.get('refreshToken')}
-						/>;
-
-					this.setState({
-						'userProfile': user,
-						'spotifyService': new SpotifyService('Tune Mountain', urlParams.get('accessToken'))
-					});
-
-				})
-				.catch(err => console.error(err));
-		}
-
 	}
 
-
 	render() {
-
-
-		const endpoint = '/spotify-service/login';
-
-		const btn = <button><a href={`${DEBUG_URL}${endpoint}`}>Login with Spotify</a></button>;
-		const playpause = <button onClick={() => {
-			if (this.state.spotifyService) this.state.spotifyService.togglePlayback();
-		}}>Play / Pause</button>;
-
-		const connect = <button onClick={() => {
-			if (this.state.spotifyService) this.state.spotifyService.play("spotify:track:2Wo9g52HBAuThdJaUEYKdY");
-		}}>Retry connect</button>;
 
 		return(
 			<div>
 
-				{btn}
-
-				{this.state.userProfile}
-
-				{this.state.spotifyService ? [playpause, connect] : null}
+				{this.state.currentMenu || <HUDMainMenu onLoginRequest={this.spotifyService.login}
+														hasLoggedIn={this.state.hasLoggedIn}
+														onSongSelectRequest={() => this.setState({"currentMenu": <HUDSongSearchMenu spotifyService={this.spotifyService}/>})}
+				/>}
 
 			</div>
 		);
