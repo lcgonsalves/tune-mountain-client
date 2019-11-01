@@ -2,8 +2,9 @@ import React, {Component} from "react";
 import PropTypes from "prop-types";
 import dotProp from "dot-prop";
 import HUDSearchBar from "../../components/hud/HUDSearchBar";
-import SpotifySongListItem from "../../components/hud/SpotifySongListItem";
+import SpotifySong from "../../components/hud/SpotifySong";
 import "../../css/hud/HUDSongSearch.css";
+import HUDButton, {HUDButtonTypesEnum} from "../../components/hud/HUDButton";
 
 const MSG_IDENTIFIER = "message";
 
@@ -74,6 +75,7 @@ class HUDSongSearchMenu extends Component {
 
     /**
      * Parses array of songs in state and converts them into JSX elements.
+     * @returns {Array} array of SpotifySong Components
      */
     renderSongList() {
 
@@ -85,12 +87,13 @@ class HUDSongSearchMenu extends Component {
 
         }
 
-        return songList.map(song => <SpotifySongListItem
+        return songList.map(song => <SpotifySong
                 name={song.name}
                 artist={song.artist}
                 imgURL={song.img}
                 id={song.id}
                 key={song.id}
+                handleClick={() => this.props.selectSong(song)}
             />);
 
     }
@@ -105,6 +108,11 @@ class HUDSongSearchMenu extends Component {
                         searchSongsWithQuery={input => this.spotifyService.search(this.filterReceivedJSON, input)}
                     />
                     {this.renderSongList()}
+                    <HUDButton
+                        text={"<"}
+                        type={HUDButtonTypesEnum.RETURN}
+                        onClick={this.props.onReturn}
+                    />
                 </div>
             </div>
         );
@@ -117,13 +125,17 @@ HUDSongSearchMenu.defaultProps = {
     "spotifyService": null,
     "selectSong": song => {
         console.error("Couldn't select song. No handler passed", song);
+    },
+    "onReturn": () => {
+        console.error("No return button handler passed.");
     }
 };
 
 // prop type constraints
 HUDSongSearchMenu.propTypes = {
     "spotifyService": PropTypes.object,
-    "selectSong": PropTypes.func
+    "selectSong": PropTypes.func,
+    "onReturn": PropTypes.func
 };
 
 export default HUDSongSearchMenu;

@@ -1,19 +1,30 @@
-.song-li-container {
+.song-container-small {
     height: 10vw;
     width: 80%;
     transition: all 0.3s;
     margin: 0 auto 0.8vw auto;
     cursor: pointer;
-    border: transparent solid 2px;
-    border-radius: 10px;
 
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: left;
+
+    border: transparent solid 2px;
+    border-radius: 10px;
 }
 
-.song-li-container:hover {
+.song-container-large {
+    height: 30%;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+
+    border: black solid 2px;
+    border-radius: 10px;
+}
+
+.song-container-small:hover {
     border: black solid 2px;
 }
 

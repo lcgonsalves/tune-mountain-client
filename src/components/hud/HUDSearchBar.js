@@ -10,7 +10,7 @@ class HUDSearchBar extends Component {
         super(props);
 
         this.state = {
-            "value": props.defaultTextValue
+            "value": ""
         };
         this.lastSubmittedValue = null;
 
@@ -30,7 +30,7 @@ class HUDSearchBar extends Component {
 
         // if timer has been set, clear it and reset it.
         if (this.autoSearchTimer) clearTimeout(this.autoSearchTimer);
-        this.autoSearchTimer = setTimeout(this.handleSubmit, 1000);
+        this.autoSearchTimer = setTimeout(this.handleSubmit, this.props.submissionTimeoutDelay);
 
         this.setState({"value": event.target.value});
 
@@ -59,7 +59,7 @@ class HUDSearchBar extends Component {
     render() {
         return(
             <div className="search-bar-container">
-                <input className="text-box" type="text" value={this.state.value} onChange={this.handleChange} />
+                <input className="text-box" placeholder={this.props.placeholder} type="text" value={this.state.value} onChange={this.handleChange} />
                 <HUDButton type={HUDButtonTypesEnum.ENTER}
                            text="Search"
                            onClick={this.handleSubmit}
@@ -75,13 +75,15 @@ HUDSearchBar.defaultProps = {
     "searchSongsWithQuery": query => {
         throw new Error(`Unable to search song with query ${query}. No handler passed.`);
     },
-    "defaultTextValue": "Type the name of a song..."
+    "placeholder": "Type the name of a song...",
+    "submissionTimeoutDelay": 2000
 };
 
 // prop type constraints
 HUDSearchBar.propTypes = {
     "searchSongsWithQuery": PropTypes.func,
-    "defaultTextValue": PropTypes.string
+    "placeholder": PropTypes.string,
+    "submissionTimeoutDelay": PropTypes.number
 };
 
 export default HUDSearchBar;

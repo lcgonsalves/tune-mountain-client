@@ -1,7 +1,6 @@
 import React, {Component} from "react";
-import HUDMainMenu from "./hud/HUDMainMenu";
 import SpotifyService from "../utils/SpotifyService";
-import HUDSongSearchMenu from "./hud/HUDSongSearchMenu";
+import HUDOverlayManager from "../utils/HUDOverlayManager";
 
 const APP_NAME = "Tune Mountain";
 
@@ -36,14 +35,10 @@ class App extends Component {
 	render() {
 
 		return(
-			<div>
-
-				{this.state.currentMenu || <HUDMainMenu onLoginRequest={this.spotifyService.login}
-														hasLoggedIn={this.state.hasLoggedIn}
-														onSongSelectRequest={() => this.setState({"currentMenu": <HUDSongSearchMenu spotifyService={this.spotifyService}/>})}
-				/>}
-
-			</div>
+			<HUDOverlayManager
+				spotifyService={this.spotifyService}
+				hasLoggedIn={this.state.hasLoggedIn}
+			/>
 		);
 
 	}

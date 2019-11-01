@@ -266,7 +266,7 @@ class SpotifyService {
 				);
 
 				// callback
-				if (callback) callback(json);
+				if (callback) return callback(json);
 
 			})
 			.catch(err => {

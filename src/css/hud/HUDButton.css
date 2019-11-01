@@ -26,6 +26,15 @@
     transition: 0.2s all;
 }
 
+.hud-button-return {
+    position: absolute;
+    width: 8vw;
+    height: 8vw;
+    font-size: 3vw;
+    bottom: 4vw;
+    left: 10vw;
+}
+
 .hud-button-enter:hover {
 
 }
