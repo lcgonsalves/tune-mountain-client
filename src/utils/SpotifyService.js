@@ -159,10 +159,12 @@ class SpotifyService {
 
 	/**
 	 * Plays a song on the current active player with a given spotify URI.
-	 * @param {String} uri the Spotify URI of the song. Can be acquired through search params.
+	 * @param {String} id the Spotify track ID of the song. Can be acquired through search params.
 	 * @returns {void}
 	 */
-	play(uri) {
+	play(id) {
+
+		const uri = `spotify:track:${id}`;
 
 		if (!this.player) throw new Error("Player not initialized.");
 
@@ -266,7 +268,8 @@ class SpotifyService {
 				);
 
 				// callback
-				if (callback) return callback(json);
+				// eslint-disable-next-line callback-return
+				if (callback) callback(json);
 
 			})
 			.catch(err => {
@@ -275,7 +278,65 @@ class SpotifyService {
 
 	}
 
-	// todo: GET function for fetching metadata needed for level generation
+	/**
+	 * Returns through callback an object containing "audioFeatures" and "audioAnalysis" for a given
+	 * track ID.
+	 * @param {String} id a spotify track id
+	 * @param {Function} callback callback function for handling features and analysis
+	 * @returns {void} return values are passed to callback
+	 */
+	getAudioAnalysisAndFeatures(id, callback) {
+
+		const analysisURL = `https://api.spotify.com/v1/audio-analysis/${id}`;
+		const featuresURL = `https://api.spotify.com/v1/audio-features/${id}`;
+
+		const header = {
+			"method": "GET",
+			"headers": {
+				"Accept": "application/json",
+				"Content-Type": "application/json",
+				"Authorization": `Bearer ${this.accessToken}`
+			}
+		};
+
+		let analysis = null;
+		let features = null;
+
+		fetch(analysisURL, header)
+			.then(response => response.json())
+			.then(analysisObject => {
+				analysis = analysisObject;
+
+				return fetch(featuresURL, header);
+			})
+			.then(response => response.json())
+			.then(featuresObject => {
+				features = featuresObject;
+
+				if (callback) {
+
+					// eslint-disable-next-line callback-return
+					callback({
+						features,
+						analysis
+					});
+
+				}
+
+				// emit
+				log(
+					"METADATA_FECHED",
+					{
+						"audioFeatures": features,
+						"audioAnalysis": analysis
+					},
+					"Metadata available.",
+					this.spotifyStateNotifier
+				);
+
+			})
+			.catch(error => console.error(error));
+	}
 
 }
 

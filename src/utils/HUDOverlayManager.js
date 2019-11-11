@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {Subject} from "rxjs";
+import {GameStateEnums} from "tune-mountain-input-manager";
 
 import HUDSongSearchMenu from "../pages/hud/HUDSongSearchMenu";
 import HUDMainMenu from "../pages/hud/HUDMainMenu";
@@ -19,19 +20,28 @@ class HUDOverlayManager extends Component {
     constructor(props) {
         super(props);
 
-        // observer that notifies game of state changes coming from HUD interactions
-        this.gameStateManager = props.gameStateManager;
-
         // will initialize the menu stack with main menu assuming login has been performed
         this.state = {
+            "selectedSong": null,
             "errorComponent": null,
             "menuStack": []
         };
+
+        this.mainMenuTransitionController = null;
+
+        // handle request for song to be played
+        this.props.gameStateController.onNotificationOf(GameStateEnums.PLAY, () => {
+            // only proceed if selected song exists
+            if (this.state.selectedSong) {
+                this.props.spotifyService.play(this.state.selectedSong.id);
+            }
+        });
 
         // binding functions
         this.mountSongSearchMenu = this.mountSongSearchMenu.bind(this);
         this.mountSongSelectMenu = this.mountSongSelectMenu.bind(this);
         this.popMenu = this.popMenu.bind(this);
+        this.mainMenu = this.mainMenu.bind(this);
     }
 
     componentDidMount() {
@@ -46,6 +56,8 @@ class HUDOverlayManager extends Component {
             // transition song search menu in
             this.mountSongSearchMenu(transitionObservable);
         };
+
+        this.mainMenuTransitionController = transitionObservable;
 
         // now that all is well and mounted, update menu stack with appropriate components
         this.setState({
@@ -107,14 +119,34 @@ class HUDOverlayManager extends Component {
     // mounts song select
     mountSongSelectMenu(songObject, prevScreenTransitionObservable) {
 
+        // update state to contain selected song.
+        this.setState({
+            "selectedSong": songObject
+        });
+
         // initialize transition observable
         const transitionObservable = new Subject();
 
         const handleConfirmation = () => {
             Transition.out(transitionObservable);
+            // get audio features, emit them to game
+            this.props.spotifyService
+                .getAudioAnalysisAndFeatures(
+                    songObject.id,
+                        object => {
+                            // log
+                            console.log("Features and analysis: ", object);
 
-            console.log("song confirmed!");
-            console.log(songObject);
+                            // emit data to game
+                            this.props.gameStateController.request(GameStateEnums.GENERATE, object);
+
+                            // TODO: remove forcing song to start playing
+                            this.props.gameStateController.notify(GameStateEnums.PLAY);
+                        }
+                );
+
+
+            this.mainMenu();
         };
 
         const handleReturn = () => {
@@ -155,7 +187,12 @@ class HUDOverlayManager extends Component {
 
             return {"menuStack": [...oldStack]};
 
-        }, () => console.log("Screen popped."));
+        });
+    }
+
+    // unmounts all menus except first
+    mainMenu() {
+        this.setState(oldState => ({"menuStack": [oldState.menuStack[0]]}));
     }
 
     render() {
@@ -199,10 +236,16 @@ class HUDOverlayManager extends Component {
 
 }
 
+// make both spotify and state controller required
 HUDOverlayManager.propTypes = {
-  "gameStateManager": PropTypes.object,
-  "spotifyService": PropTypes.object,
+  "gameStateController": PropTypes.object.isRequired,
+  "spotifyService": PropTypes.object.isRequired,
   "hasLoggedIn": PropTypes.bool
+};
+
+// do not run game if hasLoggedIn is not passed in
+HUDOverlayManager.defaultProps = {
+    "hasLoggedIn": false
 };
 
 export default HUDOverlayManager;
