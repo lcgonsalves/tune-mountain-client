@@ -58,8 +58,18 @@ class HUDSearchBar extends Component {
 
     render() {
         return(
-            <div className="search-bar-container">
-                <input className="text-box" placeholder={this.props.placeholder} type="text" value={this.state.value} onChange={this.handleChange} />
+            <div
+                className="search-bar-container"
+                onKeyUp={keyEvent => {
+                    if (keyEvent.keyCode === 13) this.handleSubmit();
+                }}
+            >
+                <input
+                    className="text-box"
+                    placeholder={this.props.placeholder}
+                    type="text" value={this.state.value}
+                    onChange={this.handleChange}
+                />
                 <HUDButton type={HUDButtonTypesEnum.ENTER}
                            text="Search"
                            onClick={this.handleSubmit}
