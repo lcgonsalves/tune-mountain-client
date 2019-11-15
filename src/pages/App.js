@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import SpotifyService from "../utils/SpotifyService";
 import HUDOverlayManager from "../utils/HUDOverlayManager";
-import Game from "tune-mountain";
+import Game from "tune-mountain-game";
 import {GameStateController} from "tune-mountain-input-manager";
 import "../css/App.css";
 
