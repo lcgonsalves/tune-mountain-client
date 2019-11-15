@@ -18,7 +18,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "update-tm-pkg": "npm i calemdar/tune-mountain-game#master calemdar/tune-mountain-input#master"
   },
   "eslintConfig": {
     "extends": "react-app"
