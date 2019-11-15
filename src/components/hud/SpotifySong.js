@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import "../../css/hud/SpotifySong.css";
+import {trimEnd} from "../../utils/StringTools";
 
 /**
  * React element for rendering a song and handling clicks on that element to select a song.
@@ -26,8 +27,8 @@ const SpotifySong = props => {
 
         let str = "";
 
-        arr.forEach((artist, index) => {
-           str += artist;
+        arr.forEach((artistInArray, index) => {
+           str += artistInArray;
            str += index + 1 === arr.length ? "" : ", ";
         });
 
@@ -43,8 +44,8 @@ const SpotifySong = props => {
         })}>
             <img className="song-image" src={imgURL} alt={`Album cover for song ${name} by artist ${artist}`}/>
             <div className="song-data-container">
-                <h1 className="song-name">{name}</h1>
-                <h2 className="song-artist">{renderArtistArray(artist)}</h2>
+                <h1 className="song-name">{trimEnd(name)}</h1>
+                <h2 className="song-artist">{trimEnd(renderArtistArray(artist))}</h2>
             </div>
         </div>
     );

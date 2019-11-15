@@ -1,3 +1,6 @@
+// constants
+const DEFAULT_MAX_STRING_LENGTH = 26;
+
 /**
  * Converts a paragraph to an array of words, removing any symbols so that
  * no wacky HTTP GET requests are done to Spotify.
@@ -34,6 +37,24 @@ const wordsToArray = string => {
 
 };
 
+/**
+ * Trims end of a string and adds ellipses at end of string
+ *
+ * @param {String} string input
+ * @param {Number} length integer determining max length of string
+ * @returns {String} modified string with ellipses or normal string if length is less than the one provided.
+ */
+const trimEnd = (string, length = DEFAULT_MAX_STRING_LENGTH) => {
+
+    if (string.length <= length) return string;
+
+    const substring = string.substring(0, length);
+
+    return `${substring}...`;
+
+};
+
 export {
-    wordsToArray
+    wordsToArray,
+    trimEnd
 };
