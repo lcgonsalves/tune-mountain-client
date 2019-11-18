@@ -107,7 +107,9 @@ class HUDSongSearchMenu extends Component {
                     <HUDSearchBar
                         searchSongsWithQuery={input => this.spotifyService.search(this.filterReceivedJSON, input)}
                     />
-                    {this.renderSongList()}
+                    <div className={"song-list-container"}>
+                        {this.renderSongList()}
+                    </div>
                     <HUDButton
                         text={"<"}
                         type={HUDButtonTypesEnum.RETURN}

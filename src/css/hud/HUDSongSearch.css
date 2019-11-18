@@ -10,6 +10,11 @@
     height: 100%;
 }
 
+.song-list-container {
+    height: 85%;
+    overflow: scroll;
+}
+
 .search-bar-container {
     height: 15%;
     display: flex;
