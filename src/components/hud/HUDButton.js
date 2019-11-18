@@ -35,7 +35,11 @@ const TypeToStyleMap = Object.freeze({
         "borderBottom": "solid 4px",
         "borderLeft": "solid 4px"
     },
-    "ENTER": {}
+    "ENTER": {
+        "height": "3vw",
+        "borderBottom": "solid 4px",
+        "borderLeft": "solid 4px"
+    }
 });
 
 /**
@@ -63,7 +67,8 @@ class HUDButton extends Component {
         const {
             type,
             text,
-            onClick
+            onClick,
+            style
         } = this.props;
 
         const {
@@ -79,7 +84,11 @@ class HUDButton extends Component {
 
         // return jsx
         return (
-            <div onMouseEnter={onHover} onMouseLeave={onHoverEnd} className={"button-wrapper"}>
+            <div onMouseEnter={onHover}
+                 onMouseLeave={onHoverEnd}
+                 className={"button-wrapper"}
+                 style={style}
+            >
                 <button
                     style={isHovering ? TypeToStyleMap[type] : null}
                     className={`${filteredType} hud-button`}
@@ -104,7 +113,8 @@ HUDButton.propTypes = {
     "onClick": PropTypes.func,
     "onHover": PropTypes.func,
     "onHoverEnd": PropTypes.func,
-    "isHovering": PropTypes.bool
+    "isHovering": PropTypes.bool,
+    "style": PropTypes.object
 };
 
 // default props

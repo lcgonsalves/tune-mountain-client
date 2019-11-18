@@ -26,6 +26,10 @@ const HUDSongSelectMenu = props => {
         artist
     } = songObject;
 
+    const genBtnStyle = {
+        "width": "auto"
+    };
+
     return (
         <div className="hud-song-select-outer-container">
                 <SpotifySong
@@ -35,7 +39,7 @@ const HUDSongSelectMenu = props => {
                     imgURL={img}
                     artist={artist}
                 />
-                <HUDButton text="Generate Level" onClick={onConfirmation} />
+                <HUDButton text="Generate Level" onClick={onConfirmation} style={genBtnStyle}/>
                 <HUDButton text={"<"} type={HUDButtonTypesEnum.RETURN} onClick={props.onReturn}/>
         </div>
     );
