@@ -58,6 +58,8 @@ class HUDButton extends Component {
         this.state = {
             "isHovering": false
         };
+
+        this.btnRef = React.createRef();
     }
 
 
@@ -90,9 +92,11 @@ class HUDButton extends Component {
                  style={style}
             >
                 <button
+                    ref={this.btnRef}
                     style={isHovering ? TypeToStyleMap[type] : null}
                     className={`${filteredType} hud-button`}
                     onClick={(event => {
+                        this.btnRef.current.blur();
                         event.buttonType = filteredType;
                         onClick(event);
                     })}
