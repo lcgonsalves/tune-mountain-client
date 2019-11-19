@@ -16,7 +16,37 @@
     border-bottom: 10px solid;
 }
 
-.song-container-large {height: 30%;
+.song-container-mini {
+    height: 6vw;
+    width: 20vw;
+    margin: 0 auto 0.8vw auto;
+    cursor: pointer;
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: left;
+
+    border-color: darkred;
+    background-color: rgba(217, 87, 99, 0.3);
+    border-left: 10px inset red;
+    border-bottom: 10px solid;
+}
+
+.song-container-mini .song-data-container .song-name {
+    font-size: 1.4vw;
+    white-space: nowrap;
+    margin-block-end: 0.4vw;
+}
+
+.song-container-mini .song-data-container .song-artist {
+    font-size: 0.9vw;
+    white-space: nowrap;
+    margin-block-start: 0;
+}
+
+.song-container-large {
+    height: 30%;
     border-radius: 5px;
     display: flex;
     justify-content: left;

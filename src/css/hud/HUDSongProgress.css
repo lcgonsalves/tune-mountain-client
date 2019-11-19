@@ -1,0 +1,20 @@
+.song-progress-bar-container {
+    position: absolute;
+    width: 100%;
+}
+
+#bar-wrapper {
+    height: 2vw;
+}
+
+#progress-bar {
+    height: 100%;
+    background-color: blue;
+    transition: 3.5s all;
+}
+
+.progress-bar-song-icon {
+    position: fixed;
+    left: 3vw;
+    top: 3vw;
+}

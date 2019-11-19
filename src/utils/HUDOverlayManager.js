@@ -5,8 +5,8 @@ import {GameStateEnums} from "tune-mountain-input-manager";
 
 import HUDSongSearchMenu from "../pages/hud/HUDSongSearchMenu";
 import HUDMainMenu from "../pages/hud/HUDMainMenu";
+import HUDSongProgress from "../components/hud/HUDSongProgress";
 import FadeTransition from "../components/transition/FadeTransition";
-
 import {Transition} from "./TransitionUtils";
 import SlideTransition from "../components/transition/SlideTransition";
 import HUDSongSelectMenu from "../pages/hud/HUDSongSelectMenu";
@@ -23,6 +23,8 @@ class HUDOverlayManager extends Component {
         // will initialize the menu stack with main menu assuming login has been performed
         this.state = {
             "selectedSong": null,
+            "playing": false,
+            "playbackPosition": 0,
             "errorComponent": null,
             "menuStack": []
         };
@@ -30,12 +32,18 @@ class HUDOverlayManager extends Component {
         this.mainMenuTransitionController = null;
 
         // handle request for song to be played
-        this.props.gameStateController.onNotificationOf(GameStateEnums.PLAY, () => {
+        props.gameStateController.onNotificationOf(GameStateEnums.PLAY, () => {
             // only proceed if selected song exists
             if (this.state.selectedSong) {
                 this.props.spotifyService.play(this.state.selectedSong.id);
+                this.setState({
+                    "playing": true
+                });
             }
         });
+
+        // id for timer that checks player id
+        this.playerStateUpdaterIntervalID = null;
 
         // binding functions
         this.mountSongSearchMenu = this.mountSongSearchMenu.bind(this);
@@ -73,6 +81,45 @@ class HUDOverlayManager extends Component {
                 </FadeTransition>
             ]
         });
+
+
+    }
+
+    // to be run once player starts song. sets up a timer that checks playback state every second
+    initPlaybackStateUpdater() {
+        const handler = () => {
+
+            const spotifyPlayerState = this.props.spotifyService.playerState;
+
+            if (spotifyPlayerState) {
+                    spotifyPlayerState.then(playerState => {
+                    if (!playerState) {
+
+                        console.error("User is not playing music through the Web Playback SDK");
+
+                        return;
+
+                    }
+
+                    const {
+                        position,
+                        paused
+                    } = playerState;
+
+                    this.setState({
+                        "playbackPosition": position,
+                        "playing": !paused
+                    });
+
+                });
+            }
+        };
+
+        this.playerStateUpdaterIntervalID = setInterval(handler, 3000);
+    }
+
+    // terminates timer for checking state (to be run if song is paused)
+    terminatePlaybackStateUpdater() {
 
     }
 
@@ -128,6 +175,8 @@ class HUDOverlayManager extends Component {
         const transitionObservable = new Subject();
 
         const handleConfirmation = () => {
+            this.initPlaybackStateUpdater();
+
             Transition.out(transitionObservable);
             // get audio features, emit them to game
             this.props.spotifyService
@@ -226,8 +275,16 @@ class HUDOverlayManager extends Component {
 
         }
 
+        // render song progress component
+        const progBar = <HUDSongProgress
+            songObject={this.state.selectedSong}
+            positionInMilliseconds={this.state.playbackPosition}
+            shouldDisplay={this.state.playing}
+        />;
+
         return(
             <div>
+                {progBar}
                 {this.state.errorComponent}
                 {this.state.menuStack}
             </div>
