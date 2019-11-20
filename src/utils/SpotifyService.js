@@ -50,6 +50,14 @@ class SpotifyService {
 				log("PLAYER_READY", `Spotify player ready to stream songs on ${device_id}`, $spotifyServiceStateNotifier);
 			});
 
+			// check for player state updates and notify them
+			this.player.addListener("player_state_changed", webPlaybackStateObject => log(
+				"PLAYER_STATE_CHANGED",
+				webPlaybackStateObject,
+				"Spotify player state changed!",
+				$spotifyServiceStateNotifier
+			));
+
 			// TODO: add listener for error and automatically refresh token
 
 		};

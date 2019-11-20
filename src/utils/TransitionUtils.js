@@ -14,14 +14,18 @@ const TransitionEnums = {
  */
 const Transition = {
     "in": subject => {
-        subject.next({
-            "position": TransitionEnums.IN
-        });
+        if (subject) {
+            subject.next({
+                "position": TransitionEnums.IN
+            });
+        } else console.error("Invalid subject!");
     },
     "out": subject => {
-        subject.next({
-            "position": TransitionEnums.OUT
-        });
+        if (subject) {
+            subject.next({
+                "position": TransitionEnums.OUT
+            });
+        } else console.error("Invalid subject!");
     }
 };
 
