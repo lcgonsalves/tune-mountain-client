@@ -9,8 +9,8 @@
 
 #progress-bar {
     height: 100%;
-    background-color: blue;
-    transition: 3.5s all;
+    background-color: rgba(0, 0, 255, 0.9);
+    transition: 3.5s all linear;
 }
 
 .progress-bar-song-icon {

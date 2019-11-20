@@ -18,7 +18,8 @@
 
 .song-container-mini {
     height: 6vw;
-    width: 20vw;
+    width: auto;
+    padding-right: 1.2vw;
     margin: 0 auto 0.8vw auto;
     cursor: pointer;
 
