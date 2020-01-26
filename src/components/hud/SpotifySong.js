@@ -3,10 +3,16 @@ import PropTypes from "prop-types";
 import "../../css/hud/SpotifySong.css";
 import {trimEnd} from "../../utils/StringTools";
 
+const SongContainerClassMap = Object.freeze({
+    "small": "song-container-small",
+    "large": "song-container-large",
+    "mini": "song-container-mini"
+});
+
 /**
  * React element for rendering a song and handling clicks on that element to select a song.
  *
- * Two styles are supported. Props.size can be either "small" or "large"
+ * Two styles are supported. Props.size can be either "small", "large", or "mini"
  * @param {Object} props react properties
  * @constructor
  */
@@ -17,11 +23,10 @@ const SpotifySong = props => {
         id,
         imgURL,
         artist,
+        duration,
         handleClick,
         size
     } = props;
-
-    const sizeClassName = size === "small" ? "song-container-small" : "song-container-large";
 
     const renderArtistArray = arr => {
 
@@ -36,11 +41,12 @@ const SpotifySong = props => {
     };
 
     return (
-        <div className={`${sizeClassName} song-container`} onClick={() => handleClick({
+        <div className={`${SongContainerClassMap[size]} song-container`} onClick={() => handleClick({
             name,
             id,
             imgURL,
-            artist
+            artist,
+            duration
         })}>
             <img className="song-image" src={imgURL} alt={`Album cover for song ${name} by artist ${artist}`}/>
             <div className="song-data-container">
@@ -57,8 +63,9 @@ SpotifySong.defaultProps = {
     "id": "No ID Passed",
     "imgURL": "No image URL passed",
     "artist": "No Artist",
+    "duration": -1,
     "handleClick": () => {
-        throw new Error("No click handler passed");
+        console.log("Song clicked!");
     },
     "size": "small"
 };
@@ -68,6 +75,7 @@ SpotifySong.propTypes = {
     "id": PropTypes.string,
     "imgURL": PropTypes.string,
     "artist": PropTypes.array,
+    "duration": PropTypes.number,
     "handleClick": PropTypes.func,
     "size": PropTypes.string
 };

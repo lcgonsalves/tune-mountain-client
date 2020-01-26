@@ -50,6 +50,14 @@ class SpotifyService {
 				log("PLAYER_READY", `Spotify player ready to stream songs on ${device_id}`, $spotifyServiceStateNotifier);
 			});
 
+			// check for player state updates and notify them
+			this.player.addListener("player_state_changed", webPlaybackStateObject => log(
+				"PLAYER_STATE_CHANGED",
+				webPlaybackStateObject,
+				"Spotify player state changed!",
+				$spotifyServiceStateNotifier
+			));
+
 			// TODO: add listener for error and automatically refresh token
 
 		};
@@ -113,6 +121,16 @@ class SpotifyService {
 	}
 
 	/**
+	 * Getter for current state of spotify player.
+	 * @returns {Promise} contains the player state object
+	 */
+	get playerState() {
+		if (this.player) return this.player.getCurrentState();
+
+		return null;
+	}
+
+	/**
 	 * Refreshes the user token.
 	 * @param {String} refreshToken refresh token received from Spotify
 	 * @returns {JSON} JSON returned from query.
@@ -159,12 +177,12 @@ class SpotifyService {
 
 	/**
 	 * Plays a song on the current active player with a given spotify URI.
-	 * @param {String} id the Spotify track ID of the song. Can be acquired through search params.
+	 * @param {String} songID the Spotify track ID of the song. Can be acquired through search params.
 	 * @returns {void}
 	 */
-	play(id) {
+	play(songID) {
 
-		const uri = `spotify:track:${id}`;
+		const uri = `spotify:track:${songID}`;
 
 		if (!this.player) throw new Error("Player not initialized.");
 

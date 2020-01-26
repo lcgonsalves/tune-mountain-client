@@ -48,11 +48,12 @@ class HUDSongSearchMenu extends Component {
 
         // for each item, collect URI, song name, artist name, album image
         // eslint-disable-next-line max-params
-        const createTrackObject = (id, name, artist, img) => ({
+        const createTrackObject = (id, name, artist, img, duration) => ({
             name,
             artist,
             img,
-            id
+            id,
+            duration
         });
 
         const newTrackArray = items.map(item => {
@@ -61,8 +62,9 @@ class HUDSongSearchMenu extends Component {
             const songName = item.name;
             const artistNames = dotProp.get(item, "artists").map(artist => artist.name);
             const imgURL = dotProp.get(item, "album.images")[0].url;
+            const duration = dotProp.get(item, "duration_ms");
 
-            return createTrackObject(id, songName, artistNames, imgURL);
+            return createTrackObject(id, songName, artistNames, imgURL, duration);
 
         });
 
@@ -91,6 +93,7 @@ class HUDSongSearchMenu extends Component {
                 name={song.name}
                 artist={song.artist}
                 imgURL={song.img}
+                duration={song.duration}
                 id={song.id}
                 key={song.id}
                 handleClick={() => this.props.selectSong(song)}
