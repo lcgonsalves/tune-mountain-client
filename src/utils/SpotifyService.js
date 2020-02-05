@@ -356,6 +356,40 @@ class SpotifyService {
 			.catch(error => console.error(error));
 	}
 
+	/**
+	 *  Fetches user info
+	 *
+	 *  @returns {Promise} promise that evaluates in the response.
+	 */
+	getUserInfo() {
+
+		const handler = (resolve, reject) => {
+
+			const url = "https://api.spotify.com/v1/me";
+			const header = {
+				"method": "GET",
+				"headers": {
+					"Accept": "application/json",
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${this.accessToken}`
+				}
+			};
+
+			return fetch(url, header)
+				.then(res => res.json())
+				.then(resJSON => resolve({
+					"spotifyID": resJSON.id,
+					"displayName": resJSON.display_name,
+					"imageUrl": resJSON.images[0].url
+				}))
+				.catch(err => reject(err));
+
+		};
+
+		return new Promise(handler);
+
+	}
+
 }
 
 export default SpotifyService;
