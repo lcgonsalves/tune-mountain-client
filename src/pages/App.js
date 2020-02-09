@@ -1,6 +1,7 @@
 import React, {Component} from "react";
 import SpotifyService from "../utils/SpotifyService";
 import HUDOverlayManager from "../utils/HUDOverlayManager";
+import APIService from "../utils/APIService";
 import Game from "tune-mountain-game";
 import {GameStateController} from "tune-mountain-input-manager";
 import "../css/App.css";
@@ -15,14 +16,17 @@ class App extends Component {
 
 		const spotifyService = new SpotifyService(`${APP_NAME} Web Player`);
 		const hasLoggedIn = false;
+
 		spotifyService.stateNotifier.subscribe(state => console.log(state));
 		spotifyService.stateNotifier
 			.filter(notification => notification.state === "LOGGED_IN")
 			.subscribe(() => this.setState({"hasLoggedIn": true}));
 
 		// init player when sdk is ready
-
 		this.spotifyService = spotifyService;
+
+		// api service
+		this.apiService = new APIService();
 
 		// game components
 		this.canvasReference = React.createRef();
