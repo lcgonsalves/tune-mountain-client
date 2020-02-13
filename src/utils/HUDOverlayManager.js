@@ -11,6 +11,10 @@ import {Transition} from "./TransitionUtils";
 import SlideTransition from "../components/transition/SlideTransition";
 import HUDSongSelectMenu from "../pages/hud/HUDSongSelectMenu";
 import dotProp from "dot-prop";
+import FormOverlay from "../components/FormOverlay";
+import PauseOverlay from "../components/hud/PauseOverlay";
+
+/* eslint brace-style: 0 */
 
 /**
  * Utility responsible for unifying and managing all HUD menus and components properly.
@@ -27,7 +31,8 @@ class HUDOverlayManager extends Component {
             "playing": false,
             "playbackPosition": 0,
             "displayCompletionForm": false,
-            "errorComponent": null,
+            "displayPauseOverlay": false,
+            "displayError": false,
             "menuStack": []
         };
 
@@ -40,76 +45,16 @@ class HUDOverlayManager extends Component {
                 this.props.spotifyService.play(this.state.selectedSong.id);
 
                 this.setState({
-                    "playing": true
+                    "playing": true,
+                    "displayPauseOverlay": true
                 });
             }
         });
 
-        // handle spotify player change
+        // handle spotify player change reactively
         props.spotifyService.stateNotifier
             .filter(stateLog => stateLog.state === "PLAYER_STATE_CHANGED")
-            .subscribe(stateLog => {
-                // determine if an update is needed, then set state if so.
-                const stateObj = stateLog.body;
-
-                /*
-                 * case 1: selected song is different --
-                 *      emit idle state to game
-                 *      go back to Main menu
-                 *      pause song ?
-                 */
-                const givenId = dotProp.get(stateObj, "track_window.current_track.id");
-                const currentId = dotProp.get(this.state, "selectedSong.id");
-                const paused = dotProp.get(stateObj, "paused");
-                const position = dotProp.get(stateObj, "position");
-
-                if (givenId !== currentId) {
-
-                    props.gameStateController.request(
-                        GameStateEnums.IDLE,
-                        {"reason": "Outside forces changed the song."}
-                        );
-                    this.mainMenu();
-                    Transition.in(this.mainMenuTransitionController);
-
-                }
-
-                /*
-                 * case 2: it's paused --
-                 *      emit pause state to game
-                 */
-                else if (paused) {
-
-                    props.gameStateController.request(
-                        GameStateEnums.PAUSE,
-                        {"reason": "paused"}
-                    );
-
-                    this.setState({
-                        "playing": false
-                    });
-
-                    // so no useless updates are made
-                    this.terminatePlaybackStateUpdater();
-
-                }
-
-                /*
-                 * case 3: it's all the same
-                 *      update position
-                 */
-                else {
-
-                    // this means it's not paused too
-                    this.initPlaybackStateUpdater();
-
-                    this.setState({
-                        "playing": !paused,
-                        "playbackPosition": position
-                    });
-                }
-
-            });
+            .subscribe(stateLog => this.readAndUpdateState(stateLog.body));
 
         // id for timer that checks player id
         this.playerStateUpdaterIntervalID = null;
@@ -120,7 +65,79 @@ class HUDOverlayManager extends Component {
         this.popMenu = this.popMenu.bind(this);
         this.mainMenu = this.mainMenu.bind(this);
         this.updatePlaybackState = this.updatePlaybackState.bind(this);
+        this.renderOverlay = this.renderOverlay.bind(this);
     }
+
+    readAndUpdateState (stateObj) {
+
+            /*
+             * case 1: selected song is different --
+             *      emit idle state to game
+             *      go back to Main menu
+             *      pause song ?
+             */
+            const givenId = dotProp.get(stateObj, "track_window.current_track.id");
+            const currentId = dotProp.get(this.state, "selectedSong.id");
+            const paused = dotProp.get(stateObj, "paused");
+            const position = dotProp.get(stateObj, "position");
+
+            if (givenId !== currentId) {
+
+                this.props.gameStateController.request(
+                    GameStateEnums.IDLE,
+                    {"reason": "Outside forces changed the song."}
+                );
+                this.mainMenu();
+                this.setState({
+                    "playing": false,
+                    "displayPauseOverlay": false
+                });
+                Transition.in(this.mainMenuTransitionController);
+
+            }
+
+            /*
+             * case 2: it's paused --
+             *      emit pause state to game
+             */
+            else if (paused) {
+
+                this.props.gameStateController.request(
+                    GameStateEnums.PAUSE,
+                    {"reason": "paused"}
+                );
+
+                this.setState({
+                    "playing": false
+                });
+
+                // so no useless updates are made
+                this.terminatePlaybackStateUpdater();
+
+            }
+
+            /*
+             * case 3: it's all the same
+             *      update position
+             */
+            else {
+
+                // send play state if was previously paused
+                if (!this.state.playing) {
+                    this.props.gameStateController
+                        .request(GameStateEnums.PLAY, {"reason": "unpaused"});
+                }
+
+                // this means it's not paused too
+                this.initPlaybackStateUpdater();
+
+                this.setState({
+                    "playing": true,
+                    "playbackPosition": position
+                });
+            }
+
+        }
 
     componentDidMount() {
 
@@ -160,6 +177,7 @@ class HUDOverlayManager extends Component {
      * position to update UI.
      *
      * WARNING: expensive operation.
+     * @returns {void}
      */
     updatePlaybackState() {
         const spotifyPlayerState = this.props.spotifyService.playerState;
@@ -326,6 +344,41 @@ class HUDOverlayManager extends Component {
         this.setState(oldState => ({"menuStack": [oldState.menuStack[0]]}));
     }
 
+    // wraps overlay rendering logic
+    renderOverlay() {
+        const {
+            displayCompletionForm,
+            displayPauseOverlay,
+            displayError
+        } = this.state;
+
+        const {spotifyService} = this.props;
+
+        // toggles playback twice because the SDK is hella glitchy
+        const handlePause = () => {
+            spotifyService.toggle()
+                .then(() => spotifyService.toggle());
+
+        };
+
+        // toggles playback
+        const handleResume = () => {
+            spotifyService.toggle();
+        };
+
+        // prioritize error screen
+        if (displayError) return null;
+        else if (displayCompletionForm) return <FormOverlay />; // todo: setup on submit callbacks
+        else if (displayPauseOverlay) return <PauseOverlay
+            isPlaying={this.state.playing}
+            onPause={handlePause}
+            onResume={handleResume}
+        />;
+        // callbacks for fading it out
+
+        return null;
+    }
+
     render() {
 
         // if user has not logged in yet, display incomplete main menu as the only object on screen
@@ -368,7 +421,7 @@ class HUDOverlayManager extends Component {
             <div>
                 {progBar}
                 {this.state.errorComponent}
-                {/* todo: insert overlays here */}
+                {this.renderOverlay()}
                 {this.state.menuStack}
             </div>
         );

@@ -5,7 +5,6 @@ import APIService from "../utils/APIService";
 import Game from "tune-mountain-game";
 import {GameStateController} from "tune-mountain-input-manager";
 import "../css/App.css";
-import FormOverlay from "../components/FormOverlay";
 
 const APP_NAME = "Tune Mountain";
 
