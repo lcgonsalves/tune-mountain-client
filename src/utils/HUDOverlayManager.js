@@ -367,8 +367,8 @@ class HUDOverlayManager extends Component {
         return(
             <div>
                 {progBar}
-                {}
                 {this.state.errorComponent}
+                {/* todo: insert overlays here */}
                 {this.state.menuStack}
             </div>
         );
