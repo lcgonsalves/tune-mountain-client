@@ -15,6 +15,7 @@ import FormOverlay from "../components/FormOverlay";
 import PauseOverlay from "../components/hud/PauseOverlay";
 
 /* eslint brace-style: 0 */
+/* eslint max-lines: 0 */
 
 /**
  * Utility responsible for unifying and managing all HUD menus and components properly.
