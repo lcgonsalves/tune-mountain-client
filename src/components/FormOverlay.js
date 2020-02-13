@@ -57,7 +57,7 @@ class FormOverlay extends Component {
             <div className="question-container" key={key}>
                 <p>{text}</p>
                 {inputComponent}
-                {currentValueDisplay || <p>{currentValueDisplay}</p>}
+                {currentValueDisplay ? <p>{currentValueDisplay}</p> : null}
             </div>
         );
     }

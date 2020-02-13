@@ -135,6 +135,19 @@ class SpotifyService {
 	}
 
 	/**
+	 * Connects spotify player to Spotify Connct
+	 */
+	activate() {
+		if (this.player) return this.player.connect();
+
+		return null;
+	}
+
+	deactivate() {
+		if (this.player) this.player.disconnect();
+	}
+
+	/**
 	 * Refreshes the user token.
 	 * @param {String} refreshToken refresh token received from Spotify
 	 * @returns {JSON} JSON returned from query.

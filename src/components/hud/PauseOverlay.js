@@ -12,9 +12,7 @@ const PauseOverlay = props => {
         onResume
     } = props;
 
-    const handleClick = evt => {
-        console.log(isPlaying ? "running onPause()" : "running onResume()");
-
+    const handleClick = () => {
         if (isPlaying) onPause();
         onResume();
     };

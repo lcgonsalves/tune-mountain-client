@@ -83,16 +83,26 @@ class HUDOverlayManager extends Component {
 
             if (givenId !== currentId) {
 
-                this.props.gameStateController.request(
-                    GameStateEnums.IDLE,
-                    {"reason": "Outside forces changed the song."}
-                );
-                this.mainMenu();
-                this.setState({
-                    "playing": false,
-                    "displayPauseOverlay": false
-                });
-                Transition.in(this.mainMenuTransitionController);
+                // only handle mistaken change of state if completion form is not up
+                if (!this.state.displayCompletionForm) {
+
+                    this.props.gameStateController.request(
+                        GameStateEnums.IDLE,
+                        {"reason": "Outside forces changed the song."}
+                    );
+                    this.mainMenu();
+
+                    this.setState({
+                        "playing": false,
+                        "displayPauseOverlay": false
+                    });
+
+                    Transition.in(this.mainMenuTransitionController);
+
+                    // make sure user cannot force Spotify Player to play any tracks
+                    this.props.spotifyService.deactivate();
+
+                }
 
             }
 
@@ -102,15 +112,38 @@ class HUDOverlayManager extends Component {
              */
             else if (paused) {
 
-                this.props.gameStateController.request(
-                    GameStateEnums.PAUSE,
-                    {"reason": "paused"}
-                );
+                // check if at the end of the song
+                if (position === 0) {
 
-                this.setState({
-                    "playing": false
-                });
+                    this.props.gameStateController.request(
+                        GameStateEnums.IDLE,
+                        {"reason": "end"}
+                    );
 
+
+                    this.setState({
+                        "playing": false,
+                        "displayPauseOverlay": false,
+                        "displayCompletionForm": true
+                    });
+
+                    this.props.spotifyService.deactivate();
+
+
+                } else {
+
+                    this.props.gameStateController.request(
+                        GameStateEnums.PAUSE,
+                        {"reason": "paused"}
+                    );
+
+                    this.setState({
+                        "playing": false,
+                        "playbackPosition": position
+                    });
+
+
+                }
                 // so no useless updates are made
                 this.terminatePlaybackStateUpdater();
 
@@ -294,6 +327,8 @@ class HUDOverlayManager extends Component {
                         }
                 );
 
+            // connect to player
+            this.props.spotifyService.activate();
 
             this.mainMenu();
         };
