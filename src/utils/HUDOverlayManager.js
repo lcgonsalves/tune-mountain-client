@@ -26,6 +26,7 @@ class HUDOverlayManager extends Component {
             "selectedSong": null,
             "playing": false,
             "playbackPosition": 0,
+            "displayCompletionForm": false,
             "errorComponent": null,
             "menuStack": []
         };
@@ -366,6 +367,7 @@ class HUDOverlayManager extends Component {
         return(
             <div>
                 {progBar}
+                {}
                 {this.state.errorComponent}
                 {this.state.menuStack}
             </div>
