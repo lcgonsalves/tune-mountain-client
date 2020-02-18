@@ -30,8 +30,8 @@ const TypeToStyleMap = Object.freeze({
         "height": "5vw"
     },
     "RETURN": {
-        "width": "7.8vw",
-        "height": "7vw",
+        "width": "7.8vh",
+        "height": "7vh",
         "borderBottom": "solid 4px",
         "borderLeft": "solid 4px"
     },
@@ -70,7 +70,9 @@ class HUDButton extends Component {
             type,
             text,
             onClick,
-            style
+            style,
+            children,
+            className
         } = this.props;
 
         const {
@@ -88,7 +90,7 @@ class HUDButton extends Component {
         return (
             <div onMouseEnter={onHover}
                  onMouseLeave={onHoverEnd}
-                 className={"button-wrapper"}
+                 className={`button-wrapper ${className}`}
                  style={style}
             >
                 <button
@@ -101,7 +103,7 @@ class HUDButton extends Component {
                         onClick(event);
                     })}
                 >
-                    {text}
+                    {text || children}
                 </button>
             </div>
         );
@@ -118,7 +120,9 @@ HUDButton.propTypes = {
     "onHover": PropTypes.func,
     "onHoverEnd": PropTypes.func,
     "isHovering": PropTypes.bool,
-    "style": PropTypes.object
+    "style": PropTypes.object,
+    "children": PropTypes.array,
+    "className": PropTypes.string
 };
 
 // default props
@@ -128,6 +132,8 @@ HUDButton.defaultProps = {
     "onClick": () => console.error("Click handler not set for this button."),
     "onHover": () => console.error("Hover handler not set for this button."),
     "onHoverEnd": () => console.error("End Hover handler not set for this button."),
+    "children": null,
+    "className": "",
     "isHovering": false
 };
 

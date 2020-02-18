@@ -1,0 +1,41 @@
+.pause-overlay-container {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    background: none;
+    transition: 1s;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.cover-screen {
+    background: rgba(0, 0, 0, 0.47);
+}
+
+.play-pause-btn {
+    position: absolute;
+    height: 5vw;
+    width: 5vw;
+}
+
+.play-pause-btn button {
+    height: 5vw;
+    width: 5vw;
+}
+
+.play-pause-btn img {
+    height: 60%;
+    width: auto;
+}
+
+.playing {
+    top: 5vh;
+    right: 5vw;
+}
+
+.paused {
+    position: relative;
+}

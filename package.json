@@ -9,7 +9,7 @@
     "react": "^16.9.0",
     "react-dom": "^16.9.0",
     "react-router": "^5.0.1",
-    "react-scripts": "3.1.1",
+    "react-scripts": "^3.3.1",
     "rxjs": "5.5.12",
     "tune-mountain-game": "github:calemdar/tune-mountain-game#master",
     "tune-mountain-input-manager": "github:calemdar/tune-mountain-input#master"

@@ -233,6 +233,8 @@ class APIService {
 
     }
 
+    // todo: make API call to send feedback
+
 }
 
 export default APIService;

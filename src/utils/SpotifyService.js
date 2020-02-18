@@ -110,6 +110,10 @@ class SpotifyService {
 
 		this.spotifyStateNotifier = $spotifyServiceStateNotifier;
 
+		// bind functions?
+		this.pause = this.pause.bind(this);
+		this.resume = this.resume.bind(this);
+		this.toggle = this.toggle.bind(this);
 	}
 
 	/**
@@ -131,6 +135,19 @@ class SpotifyService {
 	}
 
 	/**
+	 * Connects spotify player to Spotify Connct
+	 */
+	activate() {
+		if (this.player) return this.player.connect();
+
+		return null;
+	}
+
+	deactivate() {
+		if (this.player) this.player.disconnect();
+	}
+
+	/**
 	 * Refreshes the user token.
 	 * @param {String} refreshToken refresh token received from Spotify
 	 * @returns {JSON} JSON returned from query.
@@ -148,31 +165,35 @@ class SpotifyService {
 	}
 
 	/**
-	 * Plays/pauses playback on local spotify player.
-	 * @returns {void}
+	 * Pauses playback on local spotify player.
+	 * @returns {Promise}
 	 */
-	togglePlayback() {
+	pause() {
+		if (this.player) return this.player.pause();
 
-		this.player.getCurrentState().then(state => {
-			if (!state) {
-				console.error("User is not playing music through the Web Playback SDK");
+		return null;
 
-				this.play();
+	}
 
-				return;
-			}
+	/**
+	 * Pauses playback on local spotify player.
+	 * @returns {Promise}
+	 */
+	toggle() {
+		if (this.player) return this.player.togglePlay();
 
-			const {
-				current_track,
-				"next_tracks": [next_track]
-			} = state.track_window;
+		return null;
 
-			console.log("Currently Playing", current_track);
-			console.log("Playing Next", next_track);
-		});
+	}
 
-		this.player.togglePlay();
+	/**
+	 * Resumes playback on local spotify player
+	 * @returns {Promise}
+	 */
+	resume() {
+		if (this.player) return this.player.resume();
 
+		return null;
 	}
 
 	/**
