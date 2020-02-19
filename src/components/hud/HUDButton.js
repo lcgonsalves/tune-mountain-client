@@ -12,14 +12,16 @@ export const HUDButtonTypesEnum = Object.freeze({
     "SMALL": "SMALL",
     "LARGE": "LARGE",
     "RETURN": "RETURN",
-    "ENTER": "ENTER"
+    "ENTER": "ENTER",
+    "SPOTIFY": "SPOTIFY"
 });
 
 const TypeToClassMap = Object.freeze({
     "SMALL": "hud-button-small",
     "LARGE": "hud-button-large",
     "RETURN": "hud-button-return",
-    "ENTER": "hud-button-enter"
+    "ENTER": "hud-button-enter",
+    "SPOTIFY": "hud-button-small spotify-button"
 });
 
 const TypeToStyleMap = Object.freeze({
@@ -39,6 +41,12 @@ const TypeToStyleMap = Object.freeze({
         "height": "3vw",
         "borderBottom": "solid 4px",
         "borderLeft": "solid 4px"
+    },
+    "SPOTIFY": {
+        "borderBottom": "solid 4px",
+        "borderLeft": "solid 4px",
+        "marginTop": "1.5vw",
+        "height": "5vw"
     }
 });
 
@@ -96,7 +104,7 @@ class HUDButton extends Component {
                 <button
                     ref={this.btnRef}
                     style={isHovering ? TypeToStyleMap[type] : null}
-                    className={`${filteredType} hud-button`}
+                    className={`hud-button ${filteredType}`}
                     onClick={(event => {
                         this.btnRef.current.blur();
                         event.buttonType = filteredType;

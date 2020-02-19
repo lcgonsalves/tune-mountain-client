@@ -50,3 +50,9 @@
     border-left: 10px inset red;
     border-bottom: 10px solid;
 }
+
+.spotify-button {
+    background-color: #1DB954;
+    border-color: #062411;
+    border-left: 10px inset #1DB954;
+}
