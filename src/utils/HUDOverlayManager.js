@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {Subject} from "rxjs";
-import {GameStateEnums} from "tune-mountain-input-manager";
+import {GameStateEnums, GameStateController} from "tune-mountain-input-manager";
 
 import HUDSongSearchMenu from "../pages/hud/HUDSongSearchMenu";
 import HUDMainMenu from "../pages/hud/HUDMainMenu";
@@ -13,6 +13,7 @@ import HUDSongSelectMenu from "../pages/hud/HUDSongSelectMenu";
 import dotProp from "dot-prop";
 import FormOverlay from "../components/FormOverlay";
 import PauseOverlay from "../components/hud/PauseOverlay";
+import SpotifyService from "./SpotifyService";
 
 /* eslint brace-style: 0 */
 /* eslint max-lines: 0 */
@@ -467,8 +468,8 @@ class HUDOverlayManager extends Component {
 
 // make both spotify and state controller required
 HUDOverlayManager.propTypes = {
-  "gameStateController": PropTypes.object.isRequired,
-  "spotifyService": PropTypes.object.isRequired,
+  "gameStateController": PropTypes.instanceOf(GameStateController).isRequired,
+  "spotifyService": PropTypes.instanceOf(SpotifyService).isRequired,
   "hasLoggedIn": PropTypes.bool
 };
 

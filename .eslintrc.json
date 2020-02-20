@@ -19,6 +19,7 @@
         "react"
     ],
     "rules": {
+        "react/prop-types": [2, { "ignore": ["children"] }],
         "accessor-pairs": "error",
         "array-bracket-newline": "error",
         "array-bracket-spacing": [

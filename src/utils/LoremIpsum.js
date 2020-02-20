@@ -1,0 +1,19 @@
+const paragraphs = [
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Facilisi cras fermentum odio eu feugiat. Vitae turpis massa sed elementum tempus. Facilisis gravida neque convallis a cras semper auctor neque vitae. Sagittis eu volutpat odio facilisis. Erat nam at lectus urna duis convallis convallis tellus id. At auctor urna nunc id cursus. Sit amet dictum sit amet. Convallis posuere morbi leo urna molestie at. Sagittis aliquam malesuada bibendum arcu vitae elementum curabitur vitae. Aliquam id diam maecenas ultricies mi eget mauris pharetra et. Eget est lorem ipsum dolor. Etiam non quam lacus suspendisse faucibus interdum posuere lorem ipsum. Tellus elementum sagittis vitae et leo duis. Rhoncus aenean vel elit scelerisque.",
+    "Aliquam sem et tortor consequat id porta nibh venenatis. Suspendisse ultrices gravida dictum fusce ut placerat orci nulla pellentesque. In nisl nisi scelerisque eu ultrices. In mollis nunc sed id semper risus. Non curabitur gravida arcu ac tortor dignissim convallis aenean. Elit sed vulputate mi sit amet. Sagittis id consectetur purus ut faucibus. Vitae proin sagittis nisl rhoncus mattis rhoncus urna neque viverra. Arcu dictum varius duis at consectetur lorem. Ac turpis egestas integer eget aliquet nibh praesent. Eu non diam phasellus vestibulum lorem sed risus ultricies.",
+    "Fringilla phasellus faucibus scelerisque eleifend donec pretium. Sollicitudin aliquam ultrices sagittis orci a scelerisque. Erat velit scelerisque in dictum non consectetur a. Iaculis eu non diam phasellus vestibulum lorem sed. Faucibus turpis in eu mi bibendum neque. Facilisis volutpat est velit egestas dui id. Erat velit scelerisque in dictum non consectetur a erat nam. Sed risus ultricies tristique nulla aliquet enim tortor at auctor. Egestas purus viverra accumsan in nisl nisi scelerisque eu ultrices. Cras semper auctor neque vitae tempus. Posuere ac ut consequat semper viverra nam libero justo. Eu ultrices vitae auctor eu augue ut lectus. Pretium vulputate sapien nec sagittis aliquam malesuada bibendum arcu vitae. In ante metus dictum at. Sagittis purus sit amet volutpat. Mauris in aliquam sem fringilla. Viverra ipsum nunc aliquet bibendum enim facilisis gravida neque. Maecenas ultricies mi eget mauris pharetra. Eget mi proin sed libero.",
+    "Volutpat ac tincidunt vitae semper quis lectus. Magna fringilla urna porttitor rhoncus dolor purus. Dignissim diam quis enim lobortis scelerisque. Mattis aliquam faucibus purus in massa tempor nec feugiat nisl. Orci a scelerisque purus semper eget duis at tellus. Vehicula ipsum a arcu cursus vitae congue. Aliquet eget sit amet tellus cras adipiscing. Id semper risus in hendrerit gravida rutrum quisque. Porttitor rhoncus dolor purus non enim praesent elementum. Tortor aliquam nulla facilisi cras fermentum odio eu feugiat. Eget nunc scelerisque viverra mauris in aliquam sem fringilla.",
+    "Viverra orci sagittis eu volutpat odio facilisis. Consectetur purus ut faucibus pulvinar elementum integer enim. Ultrices dui sapien eget mi proin sed. Nisi porta lorem mollis aliquam ut porttitor leo a diam. Risus in hendrerit gravida rutrum. In ante metus dictum at tempor commodo ullamcorper. Tempor orci dapibus ultrices in. Arcu felis bibendum ut tristique. Mauris in aliquam sem fringilla ut. Tempus iaculis urna id volutpat lacus laoreet non curabitur. Urna nunc id cursus metus aliquam eleifend mi in. Sit amet tellus cras adipiscing enim eu turpis."
+];
+
+const LoremIpsum = {};
+
+LoremIpsum.get = numParagraphs => {
+    const output = [];
+
+    for (let paragraphIndex = 0; paragraphIndex < numParagraphs; paragraphIndex++) output.push(paragraphs[paragraphIndex % paragraphs.length]);
+
+    return output;
+};
+
+export default LoremIpsum;
