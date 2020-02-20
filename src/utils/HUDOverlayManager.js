@@ -14,6 +14,7 @@ import dotProp from "dot-prop";
 import FormOverlay from "../components/FormOverlay";
 import PauseOverlay from "../components/hud/PauseOverlay";
 import SpotifyService from "./SpotifyService";
+import MessageOverlay from "../components/MessageOverlay";
 
 /* eslint brace-style: 0 */
 /* eslint max-lines: 0 */
@@ -34,6 +35,8 @@ class HUDOverlayManager extends Component {
             "playbackPosition": 0,
             "displayCompletionForm": false,
             "displayPauseOverlay": false,
+            "displayWelcomeOverlay": false,
+            "displayNewPlayerOverlay": false,
             "displayError": false,
             "menuStack": []
         };
@@ -204,6 +207,10 @@ class HUDOverlayManager extends Component {
             ]
         });
 
+        // show welcome in a couple seconds if appropriate
+        if (!this.props.hasLoggedIn) setTimeout(() => this.setState({
+            "displayWelcomeOverlay": true
+        }), 1500);
 
     }
 
@@ -386,7 +393,8 @@ class HUDOverlayManager extends Component {
         const {
             displayCompletionForm,
             displayPauseOverlay,
-            displayError
+            displayError,
+            displayWelcomeOverlay
         } = this.state;
 
         const {spotifyService} = this.props;
@@ -411,6 +419,12 @@ class HUDOverlayManager extends Component {
             onPause={handlePause}
             onResume={handleResume}
         />;
+        else if (displayWelcomeOverlay) return <MessageOverlay
+            buttonText="Let's Go!"
+            onButtonClick={() => this.setState({ displayWelcomeOverlay: false })}
+            title="Welcome to Tune Mountain!"
+            subtitle="An audio-visualizer by Léo, Cem, Jarod, and Peter"
+        />;
         // callbacks for fading it out
 
         return null;
@@ -419,33 +433,37 @@ class HUDOverlayManager extends Component {
     render() {
 
         // if user has not logged in yet, display incomplete main menu as the only object on screen
-        if (!this.props.hasLoggedIn) {
+        const mainComponent = () => {
+            if (!this.props.hasLoggedIn) {
 
-            // initialize transition observable
-            const transitionObservable = new Subject();
+                // initialize transition observable
+                const transitionObservable = new Subject();
 
-            /*
-             * TODO: assign appropriate fadeout handlers according to button press
-             * let fadeOutHandler = () => console.log("Fade out handler not set for main menu.");
-             */
-            const onMount = () => Transition.in(transitionObservable);
+                /*
+                 * TODO: assign appropriate fadeout handlers according to button press
+                 * let fadeOutHandler = () => console.log("Fade out handler not set for main menu.");
+                 */
+                const onMount = () => Transition.in(transitionObservable);
 
-            return (
-                <div>
-                    <FadeTransition
-                        transitionRequestObservable={transitionObservable}
-                        // onEndTransitionOut={fadeOutHandler}
-                        onMount={onMount}
-                    >
-                        <HUDMainMenu
-                            onLoginRequest={this.props.spotifyService.login}
-                            hasLoggedIn={false}
-                        />
-                    </FadeTransition>
-                </div>
-            );
+                return (
+                    <div>
+                        <FadeTransition
+                            transitionRequestObservable={transitionObservable}
+                            // onEndTransitionOut={fadeOutHandler}
+                            onMount={onMount}
+                        >
+                            <HUDMainMenu
+                                onLoginRequest={this.props.spotifyService.login}
+                                hasLoggedIn={false}
+                            />
+                        </FadeTransition>
+                    </div>
+                );
 
-        }
+            } else {
+                return this.state.menuStack;
+            }
+        };
 
         // render song progress component
         const progBar = <HUDSongProgress
@@ -459,7 +477,7 @@ class HUDOverlayManager extends Component {
                 {progBar}
                 {this.state.errorComponent}
                 {this.renderOverlay()}
-                {this.state.menuStack}
+                {mainComponent()}
             </div>
         );
     }

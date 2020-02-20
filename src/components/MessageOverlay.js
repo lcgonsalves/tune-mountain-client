@@ -3,6 +3,9 @@ import PropTypes from "prop-types";
 import HUDButton, {HUDButtonTypesEnum} from "./hud/HUDButton";
 import "../css/MessageOverlay.css";
 import LoremIpsum from "../utils/LoremIpsum";
+import FadeTransition from "./transition/FadeTransition";
+import {Subject} from "rxjs";
+import {Transition} from "../utils/TransitionUtils";
 
 /**
  * Renders an overlay with a button. Possible to pass either
@@ -38,17 +41,27 @@ const MessageOverlay = props => {
     if (children) bodyElement = children;
     else if (paragraphs && Array.isArray(paragraphs)) bodyElement = paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>);
 
+    const transitionObservable = new Subject();
+    const handleButtonClick = () => Transition.out(transitionObservable);
+
     return (
 
-            <div className="message-overlay-outer-container">
-                <div className="message-overlay-body-container">
-                    {titleElement}
-                    {subtitleElement}
-                    {bodyElement}
-                    <br/>
-                    <HUDButton type={HUDButtonTypesEnum.SMALL} text={buttonText} onClick={onButtonClick} />
+            <FadeTransition
+                transitionRequestObservable={transitionObservable}
+                shouldMountIn={false}
+                zIndex={3}
+                onEndTransitionOut={onButtonClick} >
+
+                <div className="message-overlay-outer-container">
+                    <div className="message-overlay-body-container">
+                        {titleElement}
+                        {subtitleElement}
+                        {bodyElement}
+                        <br/>
+                        <HUDButton type={HUDButtonTypesEnum.SMALL} text={buttonText} onClick={handleButtonClick} />
+                    </div>
                 </div>
-            </div>
+            </FadeTransition>
     );
 
 };

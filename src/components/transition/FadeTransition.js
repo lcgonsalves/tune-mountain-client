@@ -12,7 +12,8 @@ const FadeTransition = props => {
         onEndTransitionIn,
         onEndTransitionOut,
         transitionRequestObservable,
-        onMount
+        onMount,
+        zIndex
     } = props;
 
     // default to transitioning in on mount
@@ -20,6 +21,7 @@ const FadeTransition = props => {
 
     return (
         <GenericTransitionWrapper
+            zIndex={zIndex}
             OUT={{"opacity": 0}}
             IN={{"opacity": 1}}
             shouldMountIn={shouldMountIn}
@@ -43,11 +45,12 @@ FadeTransition.propTypes = {
     "onMount": PropTypes.func,
     "transitionRequestObservable": PropTypes.any.isRequired,
     "shouldMountIn": PropTypes.bool,
-    "children": PropTypes.any
+    "zIndex": PropTypes.number
 };
 
 FadeTransition.defaultProps = {
-    "shouldMountIn": false
+    "shouldMountIn": false,
+    "zIndex": 0
 };
 
 export default FadeTransition;
