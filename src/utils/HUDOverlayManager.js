@@ -15,6 +15,7 @@ import FormOverlay from "../components/FormOverlay";
 import PauseOverlay from "../components/hud/PauseOverlay";
 import SpotifyService from "./SpotifyService";
 import MessageOverlay from "../components/MessageOverlay";
+import LoadingOverlay from "../components/hud/LoadingOverlay";
 
 /* eslint brace-style: 0 */
 /* eslint max-lines: 0 */
@@ -35,6 +36,8 @@ class HUDOverlayManager extends Component {
             "playbackPosition": 0,
             "displayCompletionForm": false,
             "displayPauseOverlay": false,
+            "displayLoadingOverlay": false,
+            "mountLoadingOverlay": false,
             "displayWelcomeOverlay": false,
             "displayNewPlayerOverlay": false,
             "displayError": false,
@@ -51,6 +54,7 @@ class HUDOverlayManager extends Component {
 
                 this.setState({
                     "playing": true,
+                    "displayLoadingOverlay": false,
                     "displayPauseOverlay": true
                 });
             }
@@ -319,6 +323,11 @@ class HUDOverlayManager extends Component {
         const handleConfirmation = () => {
             this.initPlaybackStateUpdater();
 
+            this.setState({
+                "displayLoadingOverlay": true,
+                "mountLoadingOverlay": true
+            });
+
             Transition.out(transitionObservable);
             // get audio features, emit them to game
             this.props.spotifyService
@@ -331,8 +340,6 @@ class HUDOverlayManager extends Component {
                             // emit data to game
                             this.props.gameStateController.request(GameStateEnums.GENERATE, object);
 
-                            // TODO: remove forcing song to start playing
-                            this.props.gameStateController.notify(GameStateEnums.PLAY);
                         }
                 );
 
@@ -421,13 +428,45 @@ class HUDOverlayManager extends Component {
         />;
         else if (displayWelcomeOverlay) return <MessageOverlay
             buttonText="Let's Go!"
-            onButtonClick={() => this.setState({ displayWelcomeOverlay: false })}
+            onButtonClick={() => this.setState({"displayWelcomeOverlay": false})}
             title="Welcome to Tune Mountain!"
             subtitle="An audio-visualizer by Léo, Cem, Jarod, and Peter"
+            paragraphs={["Test"]}
         />;
         // callbacks for fading it out
 
         return null;
+    }
+
+    // logic for rendering loading overlay
+    renderLoadingOverlay() {
+
+        const {
+            displayLoadingOverlay,
+            mountLoadingOverlay
+        } = this.state;
+
+        const observable = new Subject();
+
+        console.log({
+            displayLoadingOverlay,
+            mountLoadingOverlay
+        });
+
+        if (displayLoadingOverlay && mountLoadingOverlay) {
+
+            return <LoadingOverlay
+                transitionObservable={observable}
+                onUnmount={() => this.setState({
+                    "mountLoadingOverlay": false
+                })}
+            />;
+
+        }
+
+        return null;
+
+
     }
 
     render() {
@@ -460,9 +499,10 @@ class HUDOverlayManager extends Component {
                     </div>
                 );
 
-            } else {
-                return this.state.menuStack;
             }
+
+return this.state.menuStack;
+
         };
 
         // render song progress component
@@ -476,6 +516,7 @@ class HUDOverlayManager extends Component {
             <div>
                 {progBar}
                 {this.state.errorComponent}
+                {this.renderLoadingOverlay()}
                 {this.renderOverlay()}
                 {mainComponent()}
             </div>

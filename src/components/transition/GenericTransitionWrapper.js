@@ -50,6 +50,8 @@ class GenericTransitionWrapper extends Component {
 
             } else if (position === TransitionEnums.OUT) {
 
+                console.log("request received");
+
                 this.handleTransitionStart(position);
                 this.setState({
                     position,

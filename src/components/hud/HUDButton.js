@@ -129,7 +129,6 @@ HUDButton.propTypes = {
     "onHoverEnd": PropTypes.func,
     "isHovering": PropTypes.bool,
     "style": PropTypes.object,
-    "children": PropTypes.array,
     "className": PropTypes.string
 };
 
@@ -140,7 +139,6 @@ HUDButton.defaultProps = {
     "onClick": () => console.error("Click handler not set for this button."),
     "onHover": () => console.error("Hover handler not set for this button."),
     "onHoverEnd": () => console.error("End Hover handler not set for this button."),
-    "children": null,
     "className": "",
     "isHovering": false
 };
