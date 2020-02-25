@@ -1,4 +1,5 @@
 import React, {Component} from "react";
+import PropTypes from "prop-types";
 import SlideTransition from "./transition/SlideTransition";
 import {Subject} from "rxjs";
 import {Transition} from "../utils/TransitionUtils";
@@ -9,8 +10,25 @@ import HUDButton, {HUDButtonTypesEnum} from "./hud/HUDButton";
 /* eslint line-comment-position: 0 */
 /* eslint max-params: 0 */
 
-const rangeLowToHigh = ["Very Low", "Low", "Somewhat Low", "Somewhat High", "High", "Very High"];
+const rangeLowToHigh = ["Very Poorly", "Poorly", "Somewhat Poorly", "Somewhat Well", "Well", "Very Well"];
+const rangeSlowFast = ["Too Slow", "Just Right", "Too Fast"];
 
+export const questionLabels = {
+    "q1": "What elements did you particularly enjoy?",
+    "q2": "What elements did you dislike/have problems with?",
+    "q3": "Did you feel that this experience helped enhance the music you were listening to?",
+    "q4": "To what degree did you feel the elements in the level were in sync with the music you were listening to?",
+    "q5": "To what extent did the moving background help create the feeling of going down a mountain?",
+    "q6": "How much did the moving background help give you a sense of speed as you went down the mountain? ",
+    "q7": "Did you feel like you were moving at an appropriate speed for the type of song you chose?",
+    "q8": "To what extent did the background elements positively complement your visual experience?",
+    "q9": "Did being able to choose your own song help enhance your experience over having to select a song from a given playlist?",
+    "q10": "Select all that describe your experience choosing a song",
+    "q11": "Would you like to see song recommendations based on what you listened to previously?",
+    "q12": "If there was one thing you could improve about this game what would it be?",
+    "q13": "Do you have a Spotify Premium account?",
+    "q14": "Do you have any other comments about our game?"
+};
 
 /**
  * Component that contains the end-of-game feedback
@@ -23,21 +41,46 @@ class FormOverlay extends Component {
 
         // question values
         this.state = {
-            "q1": 1, // Q1: Range from 1-6
-            "q2": "", // Q2: Textbox
-            "q3": "", // Q3: Textbox
-            "q4": "", // Q4: Textbox
+            "q1": {
+                "speed": false,
+                "tricks": false,
+                "movingBackground": false,
+                "jump": false,
+                "art": false,
+                "character": false,
+                "animations": false,
+                "mountain": false
+            }, // Q1: multiple ans
+            "q2": {
+                "speed": false,
+                "tricks": false,
+                "movingBackground": false,
+                "jump": false,
+                "art": false,
+                "character": false,
+                "animations": false,
+                "mountain": false
+            }, // Q2: mult ans
+            "q3": false, // Q3: y / n
+            "q4": 1, // Q4: range 1-6
             "q5": 1, // Q5: Range from 1-6
             "q6": 1, // Q6: Range from 1-6
-            "q7": 1, // Q7: Range from 1-6
-            "q8": "", // Q8: Textbox
-            "q9": 1, // Q9: Textbox
-            "q10": 1, // Q10: Range from 1-6
+            "q7": 2, // Q7: Range from 1-3
+            "q8": 1, // Q8: Range from 1-6
+            "q9": false, // Q9: Textbox
+            "q10": {
+                "easy": false,
+                "overwhelming": false,
+                "couldntChoose": false,
+                "cateredToMe": false,
+                "noChoiceAvailabe": false,
+                "other": false,
+                "otherValue": ""
+            }, // mult choice with other
             "q11": false, // Q11: Yes/No
-            "q12": false, // Q12: Long/Short
+            "q12": "", // Q12: txt
             "q13": false, // Q13: Yes/No
-            "q14": false, // Q14: Yes/No
-            "q15": false // Q15: Yes/No
+            "q14": "" // Q14: txt
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -56,10 +99,86 @@ class FormOverlay extends Component {
         return (
             <div className="question-container" key={key}>
                 <p>{text}</p>
-                {inputComponent}
-                {currentValueDisplay ? <p>{currentValueDisplay}</p> : null}
+                <div className="input-wrapper">
+                    {inputComponent}
+                    {currentValueDisplay ? <p><strong>{currentValueDisplay}</strong></p> : null}
+                </div>
             </div>
         );
+    }
+
+    renderMultipleChoiceContainer (text, key, choiceLabels, questionID, other = false) {
+
+        const stateObjRef = this.state[questionID];
+        const stateObjKeys = Object.keys(stateObjRef);
+
+        if (other) {
+            if (choiceLabels.length !== stateObjKeys.length - 1) {
+                console.error("Labels not compatible with keys.", {
+                    "labels": choiceLabels.length,
+                    "keys": stateObjKeys.length
+                });
+
+                return null;
+            }
+        } else if (choiceLabels.length !== stateObjKeys.length) {
+                console.error("Labels not compatible with keys.", {
+                    "labels": choiceLabels.length,
+                    "keys": stateObjKeys.length
+                });
+
+                return null;
+            }
+
+        const handleCheckboxChange = evt => {
+
+            const box = evt.target.value;
+            const oldState = stateObjRef;
+            oldState[box] = evt.target.checked;
+
+            const newState = {};
+            newState[questionID] = oldState;
+
+            this.setState(newState);
+
+        };
+
+        const handleOtherChange = evt => {
+
+            const oldState = stateObjRef;
+            oldState.otherValue = evt.target.value;
+
+            const newState = {};
+            newState[questionID] = oldState;
+
+            this.setState(newState);
+
+        };
+
+        return (
+            <div className="question-container" key={key}>
+                <p>{text}</p>
+                <div className="checkbox-array-container">
+                    {choiceLabels.map((label, index) => <div className="checkbox-div" key={questionID + index}>
+                        <label>
+                            <input
+                                type="checkbox"
+                                checked={stateObjRef[stateObjKeys[index]]}
+                                value={stateObjKeys[index]}
+                                onChange={handleCheckboxChange} /> {label}
+                        </label>
+                    </div>)}
+                    {other ? <input
+                        type="text"
+                        disabled={!stateObjRef.other}
+                        value={stateObjRef.otherValue}
+                        onChange={handleOtherChange}
+                        name={questionID}
+                        id={questionID} /> : null }
+                </div>
+            </div>
+        );
+
     }
 
     render() {
@@ -68,65 +187,65 @@ class FormOverlay extends Component {
         const onMount = () => Transition.in(transitionObservable);
         const questions = [];
 
-        const appendQuestions = () => {
-            // 1 range
+        const q1andq2Labels = [
+            "The speed",
+            "The tricks",
+            "The moving backgrounds",
+            "The jumping",
+            "The Artwork",
+            "The player character",
+            "Animations",
+            "Procedurally generated mountain"
+        ];
+
+        const generateQuestions = () => {
+            // 1
+            questions.push(this.renderMultipleChoiceContainer(
+                questionLabels.q1,
+                questions.length,
+                q1andq2Labels, "q1"
+            ));
+
+            // 2
+            questions.push(this.renderMultipleChoiceContainer(
+                questionLabels.q2,
+                questions.length,
+                q1andq2Labels,
+                "q2"
+            ));
+
+            // 3
             questions.push(this.renderQuestionContainer(
-                "How would you rate your overall enjoyment of the game?",
+                questionLabels.q3,
+                <label className="switch">
+                    <input type="checkbox"
+                           onChange={evt => this.handleChange("q3", evt.target.checked)}
+                           checked={this.state.q3} />
+                    <span className="slider"/>
+                </label>,
+                questions.length,
+                this.state.q3 ? "Yes" : "No"
+            ));
+
+            // 4
+            questions.push(this.renderQuestionContainer(
+                questionLabels.q4,
                 <input
                     type="range"
                     step="1"
-                    value={this.state.q1}
-                    onChange={evt => this.handleChange("q1", parseInt(evt.target.value, 10))}
+                    value={this.state.q4}
+                    onChange={evt => this.handleChange("q4", parseInt(evt.target.value, 10))}
                     min="1"
                     max="6"
-                    name="q1"
-                    id="q1" />,
-                questions.length,
-                rangeLowToHigh[this.state.q1 - 1]
-            ));
-
-            // 2 text
-            questions.push(this.renderQuestionContainer(
-                "What elements did you particularly enjoy?",
-                <input
-                    type="text"
-                    value={this.state.q2}
-                    onChange={evt => this.handleChange("q2", evt.target.value)}
-                    name="q2"
-                    id="q2" />,
-                questions.length,
-                this.state.q2 ? "" : "Field required"
-            ));
-
-            // 3 text
-            questions.push(this.renderQuestionContainer(
-                "What elements did you dislike/have problems with?",
-                <input
-                    type="text"
-                    value={this.state.q3}
-                    onChange={evt => this.handleChange("q3", evt.target.value)}
-                    name="q3"
-                    id="q3" />,
-                questions.length,
-                this.state.q3 ? "" : "Field required"
-            ));
-
-            // 4 text
-            questions.push(this.renderQuestionContainer(
-                "How did playing this game enhance your listening experience?",
-                <input
-                    type="text"
-                    value={this.state.q4}
-                    onChange={evt => this.handleChange("q4", evt.target.value)}
                     name="q4"
                     id="q4" />,
                 questions.length,
-                this.state.q4 ? "" : "Field required"
+                rangeLowToHigh[this.state.q4 - 1]
             ));
 
-            // 5 range
+            // 5
             questions.push(this.renderQuestionContainer(
-                "How would you rate the synchronicity between the mountain props and jumps and the music you were listening to?",
+                questionLabels.q5,
                 <input
                     type="range"
                     step="1"
@@ -137,12 +256,12 @@ class FormOverlay extends Component {
                     name="q5"
                     id="q5" />,
                 questions.length,
-                rangeLowToHigh[this.state.q5]
+                rangeLowToHigh[this.state.q5 - 1]
             ));
 
-            // 6 range
+            // 6
             questions.push(this.renderQuestionContainer(
-                "How much did the moving background help create the feeling of going down a mountain?",
+                questionLabels.q6,
                 <input
                     type="range"
                     step="1"
@@ -153,57 +272,76 @@ class FormOverlay extends Component {
                     name="q6"
                     id="q6" />,
                 questions.length,
-                this.state.q6
+                rangeLowToHigh[this.state.q6 - 1]
             ));
 
-            // 7 range
+            // 7
             questions.push(this.renderQuestionContainer(
-                "To what degree did the moving background help give you a sense of speed as you went down the mountain?",
+                questionLabels.q7,
                 <input
+                    style={{
+                        "width": "20vw"
+                    }}
                     type="range"
                     step="1"
                     value={this.state.q7}
                     onChange={evt => this.handleChange("q7", parseInt(evt.target.value, 10))}
                     min="1"
-                    max="6"
+                    max="3"
                     name="q7"
                     id="q7" />,
                 questions.length,
-                this.state.q7
+                rangeSlowFast[this.state.q7 - 1]
             ));
 
-            // 8 text
+            // 8
             questions.push(this.renderQuestionContainer(
-                "How appropriate was the downhill speed for the type of song you chose?",
-                <input
-                    type="text"
-                    value={this.state.q8}
-                    onChange={evt => this.handleChange("q8", evt.target.value)}
-                    name="q8"
-                    id="q8" />,
-                questions.length,
-                this.state.q8 ? "" : "Field required"
-            ));
-
-            // 9 range
-            questions.push(this.renderQuestionContainer(
-                "To what extent did the background elements positively complement your experience?",
+                questionLabels.q8,
                 <input
                     type="range"
                     step="1"
-                    value={this.state.q9}
-                    onChange={evt => this.handleChange("q9", parseInt(evt.target.value, 10))}
+                    value={this.state.q8}
+                    onChange={evt => this.handleChange("q8", parseInt(evt.target.value, 10))}
                     min="1"
                     max="6"
-                    name="q9"
-                    id="q9" />,
+                    name="q8"
+                    id="q8" />,
                 questions.length,
-                `(1 - not at all, 6 - very much) Your answer: ${this.state.q9}`
+                rangeLowToHigh[this.state.q8 - 1]
             ));
 
-            // 11 (checkbox)
+            // 9
             questions.push(this.renderQuestionContainer(
-                "Were you able to find the song you were looking for easily?",
+                questionLabels.q9,
+                <label className="switch">
+                    <input type="checkbox"
+                           onChange={evt => this.handleChange("q9", evt.target.checked)}
+                           checked={this.state.q9} />
+                    <span className="slider"/>
+                </label>,
+                questions.length,
+                this.state.q9 ? "Yes" : "No"
+            ));
+
+            // 10
+            questions.push(this.renderMultipleChoiceContainer(
+                questionLabels.q10,
+                questions.length,
+                [
+                    "Easy to use",
+                    "Overwhelming",
+                    "Couldn’t think of a song",
+                    "Catered to me",
+                    "My choice wasn't there",
+                    "Other"
+                ],
+                "q10",
+                true
+            ));
+
+            // 11
+            questions.push(this.renderQuestionContainer(
+                questionLabels.q11,
                 <label className="switch">
                     <input type="checkbox"
                            onChange={evt => this.handleChange("q11", evt.target.checked)}
@@ -214,22 +352,22 @@ class FormOverlay extends Component {
                 this.state.q11 ? "Yes" : "No"
             ));
 
-            // 12 (checkbox)
+            // 12
             questions.push(this.renderQuestionContainer(
-                "Did it take a short or long time to start playing the game after you picked a song?",
-                <label className="switch">
-                    <input type="checkbox"
-                           onChange={evt => this.handleChange("q12", evt.target.checked)}
-                           checked={this.state.q12} />
-                    <span className="slider"/>
-                </label>,
+                questionLabels.q12,
+                <input
+                    type="text"
+                    value={this.state.q12}
+                    onChange={evt => this.handleChange("q12", evt.target.value)}
+                    name="q12"
+                    id="q12" />,
                 questions.length,
-                this.state.q12 ? "Long" : "Short"
+                this.state.q12 ? "√" : "Field required"
             ));
 
-            // 13 (checkbox)
+            // 13
             questions.push(this.renderQuestionContainer(
-                "Would you like to see song recommendations based on what you listened to previously?",
+                questionLabels.q13,
                 <label className="switch">
                     <input type="checkbox"
                            onChange={evt => this.handleChange("q13", evt.target.checked)}
@@ -240,34 +378,21 @@ class FormOverlay extends Component {
                 this.state.q13 ? "Yes" : "No"
             ));
 
-            // 14 (checkbox)
+            // 14
             questions.push(this.renderQuestionContainer(
-                "Are you a musician?",
-                <label className="switch">
-                    <input type="checkbox"
-                           onChange={evt => this.handleChange("q14", evt.target.checked)}
-                           checked={this.state.q14} />
-                    <span className="slider"/>
-                </label>,
+                questionLabels.q14,
+                <input
+                    type="text"
+                    value={this.state.q14}
+                    onChange={evt => this.handleChange("q14", evt.target.value)}
+                    name="q14"
+                    id="q14" />,
                 questions.length,
-                this.state.q14 ? "Yes" : "No"
-            ));
-
-            // 15 (checkbox)
-            questions.push(this.renderQuestionContainer(
-                "Did you play using spotify premium?",
-                <label className="switch">
-                    <input type="checkbox"
-                           onChange={evt => this.handleChange("q15", evt.target.checked)}
-                           checked={this.state.q15} />
-                    <span className="slider"/>
-                </label>,
-                questions.length,
-                this.state.q15 ? "Yes" : "No"
+                ""
             ));
         };
 
-        appendQuestions();
+        generateQuestions();
 
         return (
             <SlideTransition
@@ -286,5 +411,9 @@ class FormOverlay extends Component {
     }
 
 }
+
+FormOverlay.propTypes = {
+    "onSubmit": PropTypes.func.isRequired
+};
 
 export default FormOverlay;
