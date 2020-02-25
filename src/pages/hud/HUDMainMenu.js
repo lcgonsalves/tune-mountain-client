@@ -50,8 +50,8 @@ const HUDMainMenu = props => {
         <div className="hud-main-menu-outer-container">
             <div className="hud-main-menu-button-container">
                 {mainButton}
-                {aboutButton}
-                {leaderboardsButton}
+                {null /* aboutButton */}
+                {null /* leaderboardsButton */}
             </div>
         </div>
 
