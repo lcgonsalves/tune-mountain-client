@@ -447,8 +447,11 @@ class HUDOverlayManager extends Component {
             onButtonClick={() => this.setState({"displayWelcomeOverlay": false})}
             title="Welcome to Tune Mountain!"
             subtitle="An audio-visualizer by Léo, Cem, Jarod, and Peter"
-            paragraphs={["Test"]}
-        />;
+        >
+            <p>Welcome to Tune Mountain. To play this game <strong>you need</strong> a Spotify premium account, so we could play the song of your choosing. After you log in click <strong>'Select Song'</strong> to choose any song from Spotify*, and the game will generate a unique mountain experience for you to snowboard down on. </p>
+            <p>Game controls can be viewed on the pause menu.</p>
+            <p>*The song has to go through the spotify audio feature analysis, so not every song might be available.</p>
+        </MessageOverlay>;
         // callbacks for fading it out
 
         return null;

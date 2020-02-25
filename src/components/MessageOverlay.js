@@ -78,8 +78,8 @@ MessageOverlay.defaultProps = {
     "buttonText": "OK",
     "onButtonClick": () => console.error("No button click handler."),
     "title": "Default message:",
-    "subtitle": "This is a message.",
-    "paragraphs": [...LoremIpsum.get(3), "Thank you for reading!"]
+    "subtitle": "This is a message."
+    // "paragraphs": [...LoremIpsum.get(3), "Thank you for reading!"]
 };
 
 export default MessageOverlay;

@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import FadeTransition from "../transition/FadeTransition";
 import {Subject} from "rxjs";
 import "../../css/hud/LoadingOverlay.css";
+import Controls from "./Controls";
 
 const LoadingOverlay = props => {
 
@@ -30,6 +31,7 @@ const LoadingOverlay = props => {
                     <div></div>
                 </div>
                 <h2 className="loading-text">Generating mountain...</h2>
+                <Controls />
             </div>
 
         </FadeTransition>
