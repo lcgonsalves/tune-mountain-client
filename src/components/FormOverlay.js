@@ -36,11 +36,13 @@ export const questionLabels = {
  */
 class FormOverlay extends Component {
 
+    // todo: constrain string length for questions
     constructor(props) {
         super(props);
 
         // question values
         this.state = {
+            "btnText": "Submit!",
             "q1": {
                 "speed": false,
                 "tricks": false,
@@ -396,14 +398,20 @@ class FormOverlay extends Component {
 
         return (
             <SlideTransition
+                zIndex={this.props.zIndex}
                 transitionRequestObservable={transitionObservable}
                 onMount={onMount} >
                 <div className={"form-container"}>
-                    <form>
+                    <form onSubmit={evt => {
+                        evt.preventDefault();
+
+                        this.props.onSubmit(this.state);
+                    }}>
                         {questions}
                         <HUDButton
+                            onClick={() => this.setState({"btnText": "Submitting..."})}
                             type={HUDButtonTypesEnum.SMALL}
-                            text={"Submit!"} />
+                            text={this.state.btnText} />
                     </form>
                 </div>
             </SlideTransition>
@@ -413,7 +421,12 @@ class FormOverlay extends Component {
 }
 
 FormOverlay.propTypes = {
-    "onSubmit": PropTypes.func.isRequired
+    "onSubmit": PropTypes.func.isRequired,
+    "zIndex": PropTypes.number
+};
+
+FormOverlay.defaultProps = {
+    "zIndex": 5
 };
 
 export default FormOverlay;

@@ -12,7 +12,8 @@ const SlideTransition = props => {
         onEndTransitionIn,
         onEndTransitionOut,
         transitionRequestObservable,
-        onMount
+        onMount,
+        zIndex
     } = props;
 
     // default to transitioning in on mount
@@ -20,6 +21,7 @@ const SlideTransition = props => {
 
     return (
         <GenericTransitionWrapper
+            zIndex={zIndex}
             OUT={{"left": "100%"}}
             IN={{"left": "0"}}
             shouldMountIn={shouldMountIn}
@@ -43,7 +45,7 @@ SlideTransition.propTypes = {
     "onMount": PropTypes.func,
     "transitionRequestObservable": PropTypes.any.isRequired,
     "shouldMountIn": PropTypes.bool,
-    "children": PropTypes.any
+    "zIndex": PropTypes.number
 };
 
 SlideTransition.defaultProps = {

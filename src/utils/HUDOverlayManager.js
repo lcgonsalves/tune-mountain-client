@@ -16,6 +16,7 @@ import PauseOverlay from "../components/hud/PauseOverlay";
 import SpotifyService from "./SpotifyService";
 import MessageOverlay from "../components/MessageOverlay";
 import LoadingOverlay from "../components/hud/LoadingOverlay";
+import APIService from "./APIService";
 
 /* eslint brace-style: 0 */
 /* eslint max-lines: 0 */
@@ -391,7 +392,9 @@ class HUDOverlayManager extends Component {
     }
 
     // unmounts all menus except first
-    mainMenu() {
+    mainMenu(show = false) {
+        const showMenu = show ? Transition.in(this.mainMenuTransitionController) : null;
+
         this.setState(oldState => ({"menuStack": [oldState.menuStack[0]]}));
     }
 
@@ -420,7 +423,20 @@ class HUDOverlayManager extends Component {
 
         // prioritize error screen
         if (displayError) return null;
-        else if (displayCompletionForm) return <FormOverlay />; // todo: setup on submit callbacks
+        else if (displayCompletionForm) return <FormOverlay
+            zIndex={this.state.menuStack.length}
+            onSubmit={respObj => {
+                APIService.submitFeedback({...respObj,
+                    "songID": dotProp.get(this.state, "selectedSong.id")})
+                    .then(() => {
+                        this.mainMenu(true);
+                        this.setState({
+                            "displayCompletionForm": false
+                        });
+                    })
+                    .catch(err => console.error(err));
+            }} />; // todo: setup on submit
+        // callbacks
         else if (displayPauseOverlay) return <PauseOverlay
             isPlaying={this.state.playing}
             onPause={handlePause}
