@@ -1,0 +1,21 @@
+.score-container {
+    display: flex;
+    align-items: center;
+    border-color: darkred;
+    background-color: rgba(217, 87, 99, 0.7);
+    border-left: 10px inset red;
+    border-bottom: 10px solid;
+    height: 7vh;
+    width: fit-content;
+    padding: 0 2vw;
+}
+
+.score-container h2 {
+    font-size: 1.4vw;
+    color: #1d1d1d;
+}
+
+.score-container h1 {
+    font-size: 1.8vw;
+    margin-left: 1.5vw;
+}

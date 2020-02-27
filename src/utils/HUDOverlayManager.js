@@ -35,6 +35,7 @@ class HUDOverlayManager extends Component {
             "selectedSong": null,
             "playing": false,
             "playbackPosition": 0,
+            "score": 0,
             "displayCompletionForm": false,
             "displayPauseOverlay": false,
             "displayLoadingOverlay": false,
@@ -60,6 +61,11 @@ class HUDOverlayManager extends Component {
                 });
             }
         });
+
+        props.gameStateController.onNotificationOf(
+                GameStateEnums.SCORE_CHANGED,
+            ({body}) => this.setState({"score": body})
+        );
 
         // handle spotify player change reactively
         props.spotifyService.stateNotifier
@@ -393,6 +399,7 @@ class HUDOverlayManager extends Component {
 
     // unmounts all menus except first
     mainMenu(show = false) {
+        // eslint-disable-next-line no-unused-vars
         const showMenu = show ? Transition.in(this.mainMenuTransitionController) : null;
 
         this.setState(oldState => ({"menuStack": [oldState.menuStack[0]]}));
@@ -448,7 +455,7 @@ class HUDOverlayManager extends Component {
             title="Welcome to Tune Mountain!"
             subtitle="An audio-visualizer by Léo, Cem, Jarod, and Peter"
         >
-            <p>Welcome to Tune Mountain. To play this game <strong>you need</strong> a Spotify premium account, so we could play the song of your choosing. After you log in click <strong>'Select Song'</strong> to choose any song from Spotify*, and the game will generate a unique mountain experience for you to snowboard down on. </p>
+            <p>Welcome to Tune Mountain. To play this game <strong>you need</strong> a Spotify premium account, so we could play the song of your choosing. After you log in click <strong>Select Song</strong> to choose any song from Spotify*, and the game will generate a unique mountain experience for you to snowboard down on. </p>
             <p>Game controls can be viewed on the pause menu.</p>
             <p>*The song has to go through the spotify audio feature analysis, so not every song might be available.</p>
         </MessageOverlay>;
@@ -466,11 +473,6 @@ class HUDOverlayManager extends Component {
         } = this.state;
 
         const observable = new Subject();
-
-        console.log({
-            displayLoadingOverlay,
-            mountLoadingOverlay
-        });
 
         if (displayLoadingOverlay && mountLoadingOverlay) {
 
@@ -529,6 +531,7 @@ return this.state.menuStack;
             songObject={this.state.selectedSong}
             positionInMilliseconds={this.state.playbackPosition}
             shouldDisplay={this.state.playing}
+            score={this.state.score}
         />;
 
         return(
