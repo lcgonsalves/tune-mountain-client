@@ -3,7 +3,7 @@ import Rx from "rxjs";
 import {processTokens, log} from "./SpotifyServiceTools";
 
 // url for react debugging on node server (comment out for building in production)
-const REDIRECT_URL = "http://localhost:8080";
+const REDIRECT_URL = ""; // http://localhost:8080";
 
 
 /**
