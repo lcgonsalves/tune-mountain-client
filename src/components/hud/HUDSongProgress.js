@@ -2,13 +2,15 @@ import React from "react";
 import PropTypes from "prop-types";
 import SpotifySong from "./SpotifySong";
 import "../../css/hud/HUDSongProgress.css";
+import ScoreContainer from "./ScoreContainer";
 
 const HUDSongProgress = props => {
 
     const {
         songObject,
         positionInMilliseconds,
-        shouldDisplay
+        shouldDisplay,
+        score
     } = props;
 
     if (!songObject) return null;
@@ -43,7 +45,6 @@ const HUDSongProgress = props => {
                 />
             </div>
             <div className={"progress-bar-song-icon"}>
-                {
                     <SpotifySong
                         name={name}
                         artist={artist}
@@ -51,7 +52,7 @@ const HUDSongProgress = props => {
                         id={id}
                         size={"mini"}
                     />
-                }
+                    <ScoreContainer score={score ? score : 0} />
             </div>
         </div>
     );
@@ -67,7 +68,8 @@ HUDSongProgress.propTypes = {
         "duration": PropTypes.number
     }),
     "positionInMilliseconds": PropTypes.number.isRequired,
-    "shouldDisplay": PropTypes.bool.isRequired
+    "shouldDisplay": PropTypes.bool.isRequired,
+    "score": PropTypes.number.isRequired
 };
 
 export default HUDSongProgress;

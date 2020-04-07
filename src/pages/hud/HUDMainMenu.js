@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-import HUDButton from "../../components/hud/HUDButton";
+import HUDButton, {HUDButtonTypesEnum} from "../../components/hud/HUDButton";
 import "../../css/hud/HUDMainMenu.css";
 
 /**
@@ -23,11 +23,13 @@ const HUDMainMenu = props => {
     const spotifyLoginButton = <HUDButton
         text="Spotify Login"
         onClick={onLoginRequest}
+        type={HUDButtonTypesEnum.SPOTIFY}
     />;
 
     const selectSongButton = <HUDButton
         text="Select Song"
         onClick={onSongSelectRequest}
+        type={HUDButtonTypesEnum.SPOTIFY}
     />;
 
     const aboutButton = <HUDButton
@@ -48,8 +50,8 @@ const HUDMainMenu = props => {
         <div className="hud-main-menu-outer-container">
             <div className="hud-main-menu-button-container">
                 {mainButton}
-                {aboutButton}
-                {leaderboardsButton}
+                {null /* aboutButton */}
+                {null /* leaderboardsButton */}
             </div>
         </div>
 

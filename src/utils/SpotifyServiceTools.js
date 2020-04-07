@@ -35,6 +35,9 @@ const getTokensFromQuery = () => {
     const accessToken = urlParams.get("accessToken");
     const refreshToken = urlParams.get("refreshToken");
 
+    // clear for safety
+    window.history.replaceState(null, "", "/");
+
     return {
         accessToken,
         refreshToken

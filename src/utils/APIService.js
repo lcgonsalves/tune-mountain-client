@@ -17,7 +17,7 @@ class APIService {
      * @param {String} imageUrl the profile picture of user // todo: Field is updated if user exists in database
      * @returns {Promise<Boolean>} resolves to true if user exists, false if user is new. Rejects if there's an error.
      */
-    checkInUser(spotifyID, displayName, imageUrl) {
+    static checkInUser(spotifyID, displayName, imageUrl) {
 
         const addNewUser = () => {
 
@@ -78,7 +78,7 @@ class APIService {
      * @param {Array<Object>} inputArray contains input objects (sessionID, action, timestamp, type)
      * @returns {Promise<null>} resolves if successful and rejects if there's an error
      */
-    saveGameSession(sessionObject, inputArray) {
+    static saveGameSession(sessionObject, inputArray) {
 
         const handler = (resolve, reject) => {
 
@@ -100,7 +100,7 @@ class APIService {
      * @returns {Promise<Number>} resolves to an integer representing the sessionID if successfully inserted, rejects if
      * there's an error
      */
-    saveGameSessionOnly(sessionObject) {
+    static saveGameSessionOnly(sessionObject) {
 
         const url = "/api/sessions";
         const init = {
@@ -139,7 +139,7 @@ class APIService {
      * @param {Number} sessionID an integer representing the id of the session
      * @returns {Promise<Object>} resolves if successfully inserted, rejects if there's an error
      */
-    saveInputArrayOnly(inputArray, sessionID) {
+    static saveInputArrayOnly(inputArray, sessionID) {
 
         const modifiedArray = inputArray.map(input => ({
             ...input,
@@ -188,7 +188,7 @@ class APIService {
      * @returns {Promise<Object>} promise that resolves in a response object containing all sessions or rejects in
      * case of an error.
      */
-    fetchLeaderboard(userID = null) {
+    static fetchLeaderboard(userID = null) {
 
         const url = `/api/leaderboard${userID ? `/${userID}` : ""}`;
 
@@ -214,7 +214,7 @@ class APIService {
      * @param {Number} sessionID id of session to which inputs will be fetched.
      * @returns {Promise<Object>} promise that resolves to object containing session info and inputs;
      */
-    fetchInputs(sessionID) {
+    static fetchInputs(sessionID) {
 
         const url = `/api/session/${sessionID}`;
 
@@ -233,7 +233,25 @@ class APIService {
 
     }
 
-    // todo: make API call to send feedback
+    /**
+     * POSTs answers to feedback form properly encoded for the SQLite database.
+     * @param {Object} answers state object in FormOverlay.js
+     */
+    static submitFeedback(responseObject) {
+
+        const url = "/api/submit-feedback";
+        const init = {
+            "method": "POST",
+            "headers": {
+                "Content-Type": "application/json"
+            },
+            "body": JSON.stringify(responseObject)
+        };
+
+        return fetch(url, init)
+            .then(response => response.json());
+
+    }
 
 }
 

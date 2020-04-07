@@ -3,7 +3,7 @@ import Rx from "rxjs";
 import {processTokens, log} from "./SpotifyServiceTools";
 
 // url for react debugging on node server (comment out for building in production)
-const DEBUG_URL = "http://localhost:8080";
+const REDIRECT_URL = ""; // http://localhost:8080";
 
 
 /**
@@ -156,7 +156,7 @@ class SpotifyService {
 
 		const tokenToBeUsed = refreshToken ? refreshToken : this.refreshToken;
 
-		return fetch(`${DEBUG_URL ? DEBUG_URL : ""}/spotify-service/refresh-token/${tokenToBeUsed}`)
+		return fetch(`${REDIRECT_URL ? REDIRECT_URL : ""}/spotify-service/refresh-token/${tokenToBeUsed}`)
 			.then(response => response.json())
 			.catch(error => {
 				console.error(error);
@@ -251,7 +251,7 @@ class SpotifyService {
 	login() {
 
 		console.log("Redirecting to Spotify for authorization...");
-		window.location = `${DEBUG_URL ? DEBUG_URL : ""}/spotify-service/login`;
+		window.location = `${REDIRECT_URL ? REDIRECT_URL : ""}/spotify-service/login`;
 
 	}
 

@@ -1,7 +1,7 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
 import {Subject} from "rxjs";
-import {GameStateEnums} from "tune-mountain-input-manager";
+import {GameStateEnums, GameStateController} from "tune-mountain-input-manager";
 
 import HUDSongSearchMenu from "../pages/hud/HUDSongSearchMenu";
 import HUDMainMenu from "../pages/hud/HUDMainMenu";
@@ -13,6 +13,10 @@ import HUDSongSelectMenu from "../pages/hud/HUDSongSelectMenu";
 import dotProp from "dot-prop";
 import FormOverlay from "../components/FormOverlay";
 import PauseOverlay from "../components/hud/PauseOverlay";
+import SpotifyService from "./SpotifyService";
+import MessageOverlay from "../components/MessageOverlay";
+import LoadingOverlay from "../components/hud/LoadingOverlay";
+import APIService from "./APIService";
 
 /* eslint brace-style: 0 */
 /* eslint max-lines: 0 */
@@ -31,8 +35,13 @@ class HUDOverlayManager extends Component {
             "selectedSong": null,
             "playing": false,
             "playbackPosition": 0,
+            "score": 0,
             "displayCompletionForm": false,
             "displayPauseOverlay": false,
+            "displayLoadingOverlay": false,
+            "mountLoadingOverlay": false,
+            "displayWelcomeOverlay": false,
+            "displayNewPlayerOverlay": false,
             "displayError": false,
             "menuStack": []
         };
@@ -47,10 +56,16 @@ class HUDOverlayManager extends Component {
 
                 this.setState({
                     "playing": true,
+                    "displayLoadingOverlay": false,
                     "displayPauseOverlay": true
                 });
             }
         });
+
+        props.gameStateController.onNotificationOf(
+                GameStateEnums.SCORE_CHANGED,
+            ({body}) => this.setState({"score": body})
+        );
 
         // handle spotify player change reactively
         props.spotifyService.stateNotifier
@@ -203,6 +218,10 @@ class HUDOverlayManager extends Component {
             ]
         });
 
+        // show welcome in a couple seconds if appropriate
+        if (!this.props.hasLoggedIn) setTimeout(() => this.setState({
+            "displayWelcomeOverlay": true
+        }), 1500);
 
     }
 
@@ -311,6 +330,11 @@ class HUDOverlayManager extends Component {
         const handleConfirmation = () => {
             this.initPlaybackStateUpdater();
 
+            this.setState({
+                "displayLoadingOverlay": true,
+                "mountLoadingOverlay": true
+            });
+
             Transition.out(transitionObservable);
             // get audio features, emit them to game
             this.props.spotifyService
@@ -323,8 +347,6 @@ class HUDOverlayManager extends Component {
                             // emit data to game
                             this.props.gameStateController.request(GameStateEnums.GENERATE, object);
 
-                            // TODO: remove forcing song to start playing
-                            this.props.gameStateController.notify(GameStateEnums.PLAY);
                         }
                 );
 
@@ -376,7 +398,10 @@ class HUDOverlayManager extends Component {
     }
 
     // unmounts all menus except first
-    mainMenu() {
+    mainMenu(show = false) {
+        // eslint-disable-next-line no-unused-vars
+        const showMenu = show ? Transition.in(this.mainMenuTransitionController) : null;
+
         this.setState(oldState => ({"menuStack": [oldState.menuStack[0]]}));
     }
 
@@ -385,7 +410,8 @@ class HUDOverlayManager extends Component {
         const {
             displayCompletionForm,
             displayPauseOverlay,
-            displayError
+            displayError,
+            displayWelcomeOverlay
         } = this.state;
 
         const {spotifyService} = this.props;
@@ -404,61 +430,117 @@ class HUDOverlayManager extends Component {
 
         // prioritize error screen
         if (displayError) return null;
-        else if (displayCompletionForm) return <FormOverlay />; // todo: setup on submit callbacks
+        else if (displayCompletionForm) return <FormOverlay
+            zIndex={this.state.menuStack.length}
+            onSubmit={respObj => {
+                APIService.submitFeedback({...respObj,
+                    "songID": dotProp.get(this.state, "selectedSong.id")})
+                    .then(() => {
+                        this.mainMenu(true);
+                        this.setState({
+                            "displayCompletionForm": false
+                        });
+                    })
+                    .catch(err => console.error(err));
+            }} />; // todo: setup on submit
+        // callbacks
         else if (displayPauseOverlay) return <PauseOverlay
             isPlaying={this.state.playing}
             onPause={handlePause}
             onResume={handleResume}
         />;
+        else if (displayWelcomeOverlay) return <MessageOverlay
+            buttonText="Let's Go!"
+            onButtonClick={() => this.setState({"displayWelcomeOverlay": false})}
+            title="Welcome to Tune Mountain!"
+            subtitle="An audio-visualizer by Léo, Cem, Jarod, and Peter"
+        >
+            <p>Welcome to Tune Mountain. To play this game <strong>you need</strong> a Spotify premium account, so we could play the song of your choosing. After you log in click <strong>Select Song</strong> to choose any song from Spotify*, and the game will generate a unique mountain experience for you to snowboard down on. </p>
+            <p>Game controls can be viewed on the pause menu.</p>
+            <p>*The song has to go through the spotify audio feature analysis, so not every song might be available.</p>
+        </MessageOverlay>;
         // callbacks for fading it out
 
         return null;
     }
 
+    // logic for rendering loading overlay
+    renderLoadingOverlay() {
+
+        const {
+            displayLoadingOverlay,
+            mountLoadingOverlay
+        } = this.state;
+
+        const observable = new Subject();
+
+        if (displayLoadingOverlay && mountLoadingOverlay) {
+
+            return <LoadingOverlay
+                transitionObservable={observable}
+                onUnmount={() => this.setState({
+                    "mountLoadingOverlay": false
+                })}
+            />;
+
+        }
+
+        return null;
+
+
+    }
+
     render() {
 
         // if user has not logged in yet, display incomplete main menu as the only object on screen
-        if (!this.props.hasLoggedIn) {
+        const mainComponent = () => {
+            if (!this.props.hasLoggedIn) {
 
-            // initialize transition observable
-            const transitionObservable = new Subject();
+                // initialize transition observable
+                const transitionObservable = new Subject();
 
-            /*
-             * TODO: assign appropriate fadeout handlers according to button press
-             * let fadeOutHandler = () => console.log("Fade out handler not set for main menu.");
-             */
-            const onMount = () => Transition.in(transitionObservable);
+                /*
+                 * TODO: assign appropriate fadeout handlers according to button press
+                 * let fadeOutHandler = () => console.log("Fade out handler not set for main menu.");
+                 */
+                const onMount = () => Transition.in(transitionObservable);
 
-            return (
-                <div>
-                    <FadeTransition
-                        transitionRequestObservable={transitionObservable}
-                        // onEndTransitionOut={fadeOutHandler}
-                        onMount={onMount}
-                    >
-                        <HUDMainMenu
-                            onLoginRequest={this.props.spotifyService.login}
-                            hasLoggedIn={false}
-                        />
-                    </FadeTransition>
-                </div>
-            );
+                return (
+                    <div>
+                        <FadeTransition
+                            transitionRequestObservable={transitionObservable}
+                            // onEndTransitionOut={fadeOutHandler}
+                            onMount={onMount}
+                        >
+                            <HUDMainMenu
+                                onLoginRequest={this.props.spotifyService.login}
+                                hasLoggedIn={false}
+                            />
+                        </FadeTransition>
+                    </div>
+                );
 
-        }
+            }
+
+return this.state.menuStack;
+
+        };
 
         // render song progress component
         const progBar = <HUDSongProgress
             songObject={this.state.selectedSong}
             positionInMilliseconds={this.state.playbackPosition}
             shouldDisplay={this.state.playing}
+            score={this.state.score}
         />;
 
         return(
             <div>
                 {progBar}
                 {this.state.errorComponent}
+                {this.renderLoadingOverlay()}
                 {this.renderOverlay()}
-                {this.state.menuStack}
+                {mainComponent()}
             </div>
         );
     }
@@ -467,8 +549,8 @@ class HUDOverlayManager extends Component {
 
 // make both spotify and state controller required
 HUDOverlayManager.propTypes = {
-  "gameStateController": PropTypes.object.isRequired,
-  "spotifyService": PropTypes.object.isRequired,
+  "gameStateController": PropTypes.instanceOf(GameStateController).isRequired,
+  "spotifyService": PropTypes.instanceOf(SpotifyService).isRequired,
   "hasLoggedIn": PropTypes.bool
 };
 

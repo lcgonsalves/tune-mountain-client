@@ -50,6 +50,8 @@ class GenericTransitionWrapper extends Component {
 
             } else if (position === TransitionEnums.OUT) {
 
+                console.log("request received");
+
                 this.handleTransitionStart(position);
                 this.setState({
                     position,
@@ -129,7 +131,10 @@ class GenericTransitionWrapper extends Component {
         return (
             <div
                 className={"transition-wrapper"}
-                style={this.state.currentStyle}
+                style={{
+                    ...this.state.currentStyle,
+                    "zIndex": this.props.zIndex
+                }}
                 onTransitionEnd={this.handleTransitionEnd}
             >
                 {this.props.children}
@@ -150,7 +155,8 @@ GenericTransitionWrapper.propTypes = {
     "onEndTransitionIn": PropTypes.func,
     "onEndTransitionOut": PropTypes.func,
     "transitionRequestObservable": PropTypes.any.isRequired,
-    "onMount": PropTypes.func
+    "onMount": PropTypes.func,
+    "zIndex": PropTypes.number
 };
 
 GenericTransitionWrapper.defaultProps = {
@@ -159,7 +165,8 @@ GenericTransitionWrapper.defaultProps = {
     "onStartTransitionOut": null,
     "onEndTransitionIn": null,
     "onEndTransitionOut": null,
-    "shouldMountIn": false
+    "shouldMountIn": false,
+    "zIndex": 0
 };
 
 export default GenericTransitionWrapper;

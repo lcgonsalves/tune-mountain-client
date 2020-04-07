@@ -3,6 +3,7 @@ import HUDButton from "./HUDButton";
 import pauseIcon from "../../img/pause.png";
 import playIcon from "../../img/play.png";
 import "../../css/hud/PauseOverlay.css";
+import Controls from "./Controls";
 
 const PauseOverlay = props => {
 
@@ -25,6 +26,7 @@ const PauseOverlay = props => {
                 text="" >
                 <img src={isPlaying ? pauseIcon : playIcon} alt="Play/Pause Icon"/>
             </HUDButton>
+            <Controls highlight={!isPlaying} hide={isPlaying} />
         </div>
     );
 
