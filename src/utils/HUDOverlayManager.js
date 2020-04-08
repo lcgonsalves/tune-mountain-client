@@ -84,6 +84,10 @@ class HUDOverlayManager extends Component {
         this.renderOverlay = this.renderOverlay.bind(this);
     }
 
+    /**
+     * Callback for reading and updating the state of Spotify Web Player
+     * @param stateObj
+     */
     readAndUpdateState (stateObj) {
 
             /*
@@ -442,7 +446,14 @@ class HUDOverlayManager extends Component {
                         });
                     })
                     .catch(err => console.error(err));
-            }} />; // todo: setup on submit
+            }}
+            onCancel={() => {
+                this.mainMenu(true);
+                this.setState({
+                    "displayCompletionForm": false
+                });
+            }}
+        />;
         // callbacks
         else if (displayPauseOverlay) return <PauseOverlay
             isPlaying={this.state.playing}

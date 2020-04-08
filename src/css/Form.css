@@ -5,6 +5,23 @@
     background: rgba(0, 0, 0, 0.75);
 }
 
+.confirmation-screen-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+
+    height: 100%;
+    padding: 0 20vw;
+    margin: 0;
+    background: rgba(0, 0, 0, 0.75);
+}
+
+.confirmation-screen-container .button-wrapper {
+    width: auto;
+}
+
 .form-container form {
     position: relative;
     top: 2vh;

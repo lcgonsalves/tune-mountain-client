@@ -235,7 +235,7 @@ class APIService {
 
     /**
      * POSTs answers to feedback form properly encoded for the SQLite database.
-     * @param {Object} answers state object in FormOverlay.js
+     * @param {Object} responseObject state object in FormOverlay.js
      */
     static submitFeedback(responseObject) {
 

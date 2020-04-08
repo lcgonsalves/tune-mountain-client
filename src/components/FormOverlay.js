@@ -43,6 +43,7 @@ class FormOverlay extends Component {
         // question values
         this.state = {
             "btnText": "Submit!",
+            "showForm": false,
             "q1": {
                 "speed": false,
                 "tricks": false,
@@ -82,7 +83,8 @@ class FormOverlay extends Component {
             "q11": false, // Q11: Yes/No
             "q12": "", // Q12: txt
             "q13": false, // Q13: Yes/No
-            "q14": "" // Q14: txt
+            "q14": "", // Q14: txt,
+            "name": ""
         };
 
         this.handleChange = this.handleChange.bind(this);
@@ -396,24 +398,49 @@ class FormOverlay extends Component {
 
         generateQuestions();
 
+        const form = <div className={"form-container"}>
+            <form onSubmit={evt => {
+                evt.preventDefault();
+
+                this.props.onSubmit(this.state);
+            }}>
+                {questions}
+                {this.renderQuestionContainer(
+                    "Please sign digitally (your name will not be associated with your responses)",
+                    <input
+                        type="text"
+                        value={this.state.name}
+                        onChange={evt => this.handleChange("name", evt.target.value)}
+                        name="name"
+                        id="name" />,
+                    questions.length
+                )}
+                <HUDButton
+                    onClick={() => this.setState({"btnText": "Submitting..."})}
+                    type={HUDButtonTypesEnum.SMALL}
+                    disabled={!this.state.name}
+                    text={this.state.name ? this.state.btnText : "Please sign this form!"} />
+            </form>
+        </div>;
+
+        const confirmationScreen = <div className="confirmation-screen-container">
+            <h1>Thank you for playing! If you are a WPI student, please take our exit form.</h1>
+            <HUDButton
+                onClick={() => this.setState({"showForm": true})}
+                text={"Show Form"}
+            />
+            <HUDButton
+                onClick={this.props.onCancel}
+                text={"Main Menu"}
+            />
+        </div>;
+
         return (
             <SlideTransition
                 zIndex={this.props.zIndex}
                 transitionRequestObservable={transitionObservable}
                 onMount={onMount} >
-                <div className={"form-container"}>
-                    <form onSubmit={evt => {
-                        evt.preventDefault();
-
-                        this.props.onSubmit(this.state);
-                    }}>
-                        {questions}
-                        <HUDButton
-                            onClick={() => this.setState({"btnText": "Submitting..."})}
-                            type={HUDButtonTypesEnum.SMALL}
-                            text={this.state.btnText} />
-                    </form>
-                </div>
+                {this.state.showForm ? form : confirmationScreen}
             </SlideTransition>
         );
     }
@@ -422,6 +449,7 @@ class FormOverlay extends Component {
 
 FormOverlay.propTypes = {
     "onSubmit": PropTypes.func.isRequired,
+    "onCancel": PropTypes.func.isRequired,
     "zIndex": PropTypes.number
 };
 

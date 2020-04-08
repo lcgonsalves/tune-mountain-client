@@ -80,7 +80,8 @@ class HUDButton extends Component {
             onClick,
             style,
             children,
-            className
+            className,
+            disabled
         } = this.props;
 
         const {
@@ -91,7 +92,7 @@ class HUDButton extends Component {
         const isValidType = Boolean(HUDButtonTypesEnum[type]);
         const filteredType = isValidType ? TypeToClassMap[type] : TypeToClassMap.SMALL;
 
-        const onHover = () => this.setState({"isHovering": true});
+        const onHover = () => this.setState({"isHovering": !disabled && true});
         const onHoverEnd = () => this.setState({"isHovering": false});
 
         // return jsx
@@ -105,6 +106,7 @@ class HUDButton extends Component {
                     ref={this.btnRef}
                     style={isHovering ? TypeToStyleMap[type] : null}
                     className={`hud-button ${filteredType}`}
+                    disabled={disabled}
                     onClick={(event => {
                         this.btnRef.current.blur();
                         event.buttonType = filteredType;
@@ -129,7 +131,8 @@ HUDButton.propTypes = {
     "onHoverEnd": PropTypes.func,
     "isHovering": PropTypes.bool,
     "style": PropTypes.object,
-    "className": PropTypes.string
+    "className": PropTypes.string,
+    "disabled": PropTypes.bool
 };
 
 // default props
@@ -140,7 +143,8 @@ HUDButton.defaultProps = {
     "onHover": () => console.error("Hover handler not set for this button."),
     "onHoverEnd": () => console.error("End Hover handler not set for this button."),
     "className": "",
-    "isHovering": false
+    "isHovering": false,
+    "disabled": false
 };
 
 export default HUDButton;

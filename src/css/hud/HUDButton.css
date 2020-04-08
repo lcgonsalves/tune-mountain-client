@@ -51,6 +51,14 @@
     border-bottom: 10px solid;
 }
 
+.hud-button:disabled {
+    cursor: not-allowed;
+    border-color: #2f2f2f;
+    background-color: #4d4d4d;
+    border-left: 10px inset #1f1f1f;
+    color: white;
+}
+
 .spotify-button {
     background-color: #1DB954;
     border-color: #062411;
