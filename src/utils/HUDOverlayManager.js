@@ -52,6 +52,11 @@ class HUDOverlayManager extends Component {
         props.gameStateController.onNotificationOf(GameStateEnums.PLAY, () => {
             // only proceed if selected song exists
             if (this.state.selectedSong) {
+
+                // begin taking inputs
+                this.props.onGameStart();
+
+                // begin playback of song
                 this.props.spotifyService.play(this.state.selectedSong.id);
 
                 this.setState({
@@ -110,6 +115,7 @@ class HUDOverlayManager extends Component {
                         GameStateEnums.IDLE,
                         {"reason": "Outside forces changed the song."}
                     );
+
                     this.mainMenu();
 
                     this.setState({
@@ -121,6 +127,9 @@ class HUDOverlayManager extends Component {
 
                     // make sure user cannot force Spotify Player to play any tracks
                     this.props.spotifyService.deactivate();
+
+                    // interrupt input collection
+                    this.props.onGameInterrupted();
 
                 }
 
@@ -147,7 +156,11 @@ class HUDOverlayManager extends Component {
                         "displayCompletionForm": true
                     });
 
+                    // stop player so external inputs can't begin playback
                     this.props.spotifyService.deactivate();
+
+                    // signal that game is over and inputs should stop being recorded, and then be stored
+                    this.props.onGameFinish(this.state.score, this.state.selectedSong.id);
 
 
                 } else {
@@ -162,8 +175,12 @@ class HUDOverlayManager extends Component {
                         "playbackPosition": position
                     });
 
+                    // pause input collection
+                    this.props.onGamePause();
+
 
                 }
+
                 // so no useless updates are made
                 this.terminatePlaybackStateUpdater();
 
@@ -188,6 +205,10 @@ class HUDOverlayManager extends Component {
                     "playing": true,
                     "playbackPosition": position
                 });
+
+                // resume inputs
+
+
             }
 
         }
@@ -533,7 +554,7 @@ class HUDOverlayManager extends Component {
 
             }
 
-return this.state.menuStack;
+        return this.state.menuStack;
 
         };
 
@@ -560,14 +581,29 @@ return this.state.menuStack;
 
 // make both spotify and state controller required
 HUDOverlayManager.propTypes = {
-  "gameStateController": PropTypes.instanceOf(GameStateController).isRequired,
-  "spotifyService": PropTypes.instanceOf(SpotifyService).isRequired,
-  "hasLoggedIn": PropTypes.bool
+    "gameStateController": PropTypes.instanceOf(GameStateController).isRequired,
+    "spotifyService": PropTypes.instanceOf(SpotifyService).isRequired,
+    "user": PropTypes.shape({
+        "imageUrl": PropTypes.string.isRequired,
+        "displayName": PropTypes.string.isRequired,
+        "spotifyID": PropTypes.string.isRequired
+    }).isRequired,
+    "hasLoggedIn": PropTypes.bool,
+    "onGamePause": PropTypes.func.isRequired,
+    "onGameResume": PropTypes.func.isRequired,
+    "onGameStart": PropTypes.func.isRequired,
+    "onGameFinish": PropTypes.func.isRequired,
+    "onGameInterrupted": PropTypes.func.isRequired
 };
 
 // do not run game if hasLoggedIn is not passed in
 HUDOverlayManager.defaultProps = {
-    "hasLoggedIn": false
+    "hasLoggedIn": false,
+    "user": {
+        "displayName": null,
+        "imageUrl": null,
+        "spotifyID": null
+    }
 };
 
 export default HUDOverlayManager;

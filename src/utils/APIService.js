@@ -116,10 +116,10 @@ class APIService {
             fetch(url, init)
                 .then(response => response.json())
                 .then(responseJSON => {
-                    const sessions = dotProp.get(responseJSON, "sessions");
+                    const id = dotProp.get(responseJSON, "lastSessionID");
 
                     return responseJSON.status === "success"
-                        ? resolve(sessions[sessions.length - 1].sessionID)
+                        ? resolve(id)
                         : reject(responseJSON);
                 })
                 .catch(err => reject(err));
@@ -142,7 +142,9 @@ class APIService {
     static saveInputArrayOnly(inputArray, sessionID) {
 
         const modifiedArray = inputArray.map(input => ({
-            ...input,
+            "timestamp": String(input.timestamp),
+            "action": input.action,
+            "type": input.type,
             sessionID
         }));
 
@@ -220,6 +222,7 @@ class APIService {
 
         const handler = (resolve, reject) => {
 
+            // TODO: un-stringify timestamp when returning inputs
             fetch(url)
                 .then(response => response.json())
                 .then(responseJSON => responseJSON.status === "success"
@@ -236,6 +239,7 @@ class APIService {
     /**
      * POSTs answers to feedback form properly encoded for the SQLite database.
      * @param {Object} responseObject state object in FormOverlay.js
+     * @returns {Promise} promise that resolves into response json
      */
     static submitFeedback(responseObject) {
 
