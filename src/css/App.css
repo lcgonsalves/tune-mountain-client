@@ -1,3 +1,14 @@
 .game-viewport {
     position: absolute;
 }
+
+#version {
+    position: absolute;
+    bottom: 1vh;
+    left: 1vh;
+    color: white;
+}
+
+body {
+    overflow: hidden;
+}

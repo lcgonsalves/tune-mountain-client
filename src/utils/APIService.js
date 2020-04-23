@@ -194,6 +194,8 @@ class APIService {
 
         const url = `/api/leaderboard${userID ? `/${userID}` : ""}`;
 
+        // todo: filter by version
+
         const handler = (resolve, reject) => {
 
             fetch(url)

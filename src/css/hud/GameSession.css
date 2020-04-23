@@ -1,0 +1,62 @@
+tr {
+    width: 100%;
+    border-top: 0.5vh;
+}
+
+th, td {
+    padding: 10px;
+}
+
+th {
+    text-align: left;
+    height: 35px;
+    padding: 0 5px;
+    background-color: #d9576d;
+}
+
+td {
+    max-height: 8%;
+    text-align: left;
+    color: white;
+}
+
+td img {
+    height: 100%;
+    width: auto;
+    border-radius: 50%;
+}
+
+.session-album-cover img {
+    border-radius: 0;
+}
+
+.session-profile-picture, .session-album-cover {
+    height: 32px;
+    text-align: center;
+}
+
+.session-song-name, .header-song-name {
+    text-align: left;
+    width: 48%;
+}
+
+.session-score {
+    max-width: 15%;
+}
+
+.session-display-name {
+    width: 25%;
+}
+
+.session-replay-button {
+    text-align: center;
+}
+
+.tr-dark {
+    background-color: #2f2f2f;
+}
+
+.tr-light {
+    background-color: #6f6f6f;
+}
+

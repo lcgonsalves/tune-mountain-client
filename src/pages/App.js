@@ -50,7 +50,7 @@ class App extends Component {
 
 		this.state = {
 			hasLoggedIn,
-			"currentMenu": null
+			"gameVersion": process.env.REACT_APP_VERSION
 		};
 
 		this.handleGameFinish = this.handleGameFinish.bind(this);
@@ -58,6 +58,9 @@ class App extends Component {
 		this.handleGamePause = this.handleGamePause.bind(this);
 		this.handleGameResume = this.handleGameResume.bind(this);
 		this.handleGameStart = this.handleGameStart.bind(this);
+		this.handleReplayBeginRequest = this.handleReplayBeginRequest.bind(this);
+		this.handleReplayInterruptRequest = this.handleReplayInterruptRequest.bind(this);
+		this.handleReplayPlaybackStart = this.handleReplayPlaybackStart.bind(this);
 
 	}
 
@@ -115,7 +118,7 @@ class App extends Component {
 				songID,
 				score,
 				"userID": this.state.user.spotifyID,
-				"gameVersion": process.env.REACT_APP_VERSION
+				"gameVersion": this.state.gameVersion
 			};
 
 			console.log(session, inputHistory);
@@ -134,6 +137,33 @@ class App extends Component {
 
 		// stops recording
 		console.log("Wrong termination", this.inputManager.terminateSession());
+
+	}
+
+	/**
+	 * Receives input history and loads it in the input manager
+	 */
+	handleReplayBeginRequest(inputHistory) {
+
+		this.inputManager.loadInputsForReplay(inputHistory);
+
+	}
+
+	/**
+	 * Terminates replay session in input manager and restores it to regular emission state.
+	 */
+	handleReplayInterruptRequest() {
+
+		this.inputManager.terminateReplaySession();
+
+	}
+
+	/**
+	 * Notifies input manager to begin replay.
+	 */
+	handleReplayPlaybackStart() {
+
+		this.inputManager.beginReplaySession();
 
 	}
 
@@ -157,7 +187,11 @@ class App extends Component {
 					onGamePause={this.handleGamePause}
 					onGameStart={this.handleGameStart}
 					onGameResume={this.handleGameResume}
+				 	onReplayBeginRequest={this.handleReplayBeginRequest}
+				 	onReplayInterruptRequest={this.handleReplayInterruptRequest}
+				 	onReplayPlaybackStart={this.handleReplayPlaybackStart}
 				/>
+				<p id="version">Ver {this.state.gameVersion}</p>
 			</div>
 		);
 

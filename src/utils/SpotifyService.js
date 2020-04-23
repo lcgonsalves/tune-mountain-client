@@ -1,6 +1,7 @@
 import fromCDN from "from-cdn";
 import Rx from "rxjs";
 import {processTokens, log} from "./SpotifyServiceTools";
+import dotProp from "dot-prop";
 
 // url for react debugging on node server (comment out for building in production)
 const REDIRECT_URL = "http://localhost:8080";
@@ -382,11 +383,11 @@ class SpotifyService {
 	 *
 	 *  @returns {Promise} promise that evaluates in the response.
 	 */
-	getUserInfo() {
+	getUserInfo(userID = null) {
 
 		const handler = (resolve, reject) => {
 
-			const url = "https://api.spotify.com/v1/me";
+			const url = userID ? `https://api.spotify.com/v1/users/${userID}` : "https://api.spotify.com/v1/me";
 			const header = {
 				"method": "GET",
 				"headers": {
@@ -403,6 +404,55 @@ class SpotifyService {
 					"displayName": resJSON.display_name,
 					"imageUrl": resJSON.images[0].url
 				}))
+				.catch(err => reject(err));
+
+		};
+
+		return new Promise(handler);
+
+	}
+
+	/**
+	 * Fetches song info
+	 *
+	 * @param {String} songID spotify id for a given song
+	 * @returns {Promise<Object>} promise that evaluates into the song object
+	 */
+	getSongInfo(songID) {
+
+		const handler = (resolve, reject) => {
+
+			const url = `https://api.spotify.com/v1/tracks/${songID}`;
+			const header = {
+				"method": "GET",
+				"headers": {
+					"Accept": "application/json",
+					"Content-Type": "application/json",
+					"Authorization": `Bearer ${this.accessToken}`
+				}
+			};
+
+			const createTrackObject = (id, name, artist, img, duration) => ({
+				name,
+				artist,
+				img,
+				id,
+				duration
+			});
+
+			return fetch(url, header)
+				.then(res => res.json())
+				.then(item => {
+
+					const id = item.id;
+					const songName = item.name;
+					const artistNames = dotProp.get(item, "artists").map(artist => artist.name);
+					const imgURL = dotProp.get(item, "album.images")[0].url;
+					const duration = dotProp.get(item, "duration_ms");
+
+					resolve(createTrackObject(id, songName, artistNames, imgURL, duration));
+
+				})
 				.catch(err => reject(err));
 
 		};

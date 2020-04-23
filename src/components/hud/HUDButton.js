@@ -24,7 +24,7 @@ const TypeToClassMap = Object.freeze({
     "SPOTIFY": "hud-button-small spotify-button"
 });
 
-const TypeToStyleMap = Object.freeze({
+const TypeToStyleMap = Object.freeze({ // todo: pull this out onto css document
     "SMALL": {
         "borderBottom": "solid 4px",
         "borderLeft": "solid 4px",
@@ -81,7 +81,7 @@ class HUDButton extends Component {
             style,
             children,
             className,
-            disabled
+            disabled // todo: make it pressed when disabled
         } = this.props;
 
         const {

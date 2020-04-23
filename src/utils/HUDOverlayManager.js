@@ -17,6 +17,7 @@ import SpotifyService from "./SpotifyService";
 import MessageOverlay from "../components/MessageOverlay";
 import LoadingOverlay from "../components/hud/LoadingOverlay";
 import APIService from "./APIService";
+import HUDLeaderboardsMenu from "../pages/hud/HUDLeaderboardsMenu";
 
 /* eslint brace-style: 0 */
 /* eslint max-lines: 0 */
@@ -43,6 +44,7 @@ class HUDOverlayManager extends Component {
             "displayWelcomeOverlay": false,
             "displayNewPlayerOverlay": false,
             "displayError": false,
+            "replayMode": false,
             "menuStack": []
         };
 
@@ -53,8 +55,12 @@ class HUDOverlayManager extends Component {
             // only proceed if selected song exists
             if (this.state.selectedSong) {
 
-                // begin taking inputs
-                this.props.onGameStart();
+                // begin taking inputs or sending stream of inputs
+                if (this.state.replayMode) {
+                    this.props.onReplayPlaybackStart();
+                } else {
+                    this.props.onGameStart();
+                }
 
                 // begin playback of song
                 this.props.spotifyService.play(this.state.selectedSong.id);
@@ -91,9 +97,15 @@ class HUDOverlayManager extends Component {
 
     /**
      * Callback for reading and updating the state of Spotify Web Player
-     * @param stateObj
+     * @param {Object} stateObj output of Spotify Web Playback SDK player
+     * @returns {void}
      */
     readAndUpdateState (stateObj) {
+
+            const givenId = dotProp.get(stateObj, "track_window.current_track.id");
+            const currentId = dotProp.get(this.state, "selectedSong.id");
+            const paused = dotProp.get(stateObj, "paused");
+            const position = dotProp.get(stateObj, "position");
 
             /*
              * case 1: selected song is different --
@@ -101,11 +113,6 @@ class HUDOverlayManager extends Component {
              *      go back to Main menu
              *      pause song ?
              */
-            const givenId = dotProp.get(stateObj, "track_window.current_track.id");
-            const currentId = dotProp.get(this.state, "selectedSong.id");
-            const paused = dotProp.get(stateObj, "paused");
-            const position = dotProp.get(stateObj, "position");
-
             if (givenId !== currentId) {
 
                 // only handle mistaken change of state if completion form is not up
@@ -118,9 +125,14 @@ class HUDOverlayManager extends Component {
 
                     this.mainMenu();
 
+                    // interrupt input collection or cancel replay
+                    if (this.state.replayMode) this.props.onReplayInterruptRequest();
+                    else this.props.onGameInterrupted();
+
                     this.setState({
                         "playing": false,
-                        "displayPauseOverlay": false
+                        "displayPauseOverlay": false,
+                        "replayMode": false
                     });
 
                     Transition.in(this.mainMenuTransitionController);
@@ -128,8 +140,8 @@ class HUDOverlayManager extends Component {
                     // make sure user cannot force Spotify Player to play any tracks
                     this.props.spotifyService.deactivate();
 
-                    // interrupt input collection
-                    this.props.onGameInterrupted();
+                    // so no useless updates are made
+                    this.terminatePlaybackStateUpdater();
 
                 }
 
@@ -138,6 +150,7 @@ class HUDOverlayManager extends Component {
             /*
              * case 2: it's paused --
              *      emit pause state to game
+             *      if the current context is *replay* terminate session
              */
             else if (paused) {
 
@@ -149,6 +162,16 @@ class HUDOverlayManager extends Component {
                         {"reason": "end"}
                     );
 
+                    if (this.state.replayMode) {
+                        // interrupt IM
+                        this.props.onReplayInterruptRequest();
+
+                        // make sure user cannot force Spotify Player to play any tracks
+                        this.props.spotifyService.deactivate();
+
+                        this.mainMenu(true);
+
+                    }
 
                     this.setState({
                         "playing": false,
@@ -225,6 +248,13 @@ class HUDOverlayManager extends Component {
             // transition song search menu in
             this.mountSongSearchMenu(transitionObservable);
         };
+        const handleLeaderboardsRequest = () => {
+            // first transition main menu out
+            Transition.out(transitionObservable);
+
+            // transition song search menu in
+            this.mountLeaderboardsPage(transitionObservable);
+        };
 
         this.mainMenuTransitionController = transitionObservable;
 
@@ -238,6 +268,7 @@ class HUDOverlayManager extends Component {
                     <HUDMainMenu
                         hasLoggedIn={true}
                         onSongSelectRequest={handleSongSelectRequest}
+                        onLeaderboardsPageRequest={handleLeaderboardsRequest}
                     />
                 </FadeTransition>
             ]
@@ -301,6 +332,84 @@ class HUDOverlayManager extends Component {
 
     }
 
+    // mounts leaderboards page and sets up hooks to change HUDOverlayManager state to replay
+    mountLeaderboardsPage(prevScreenTransitionObservable) {
+
+        // todo: mount leaderboards menu
+
+        // todo: hook function calls to fetch replays
+
+        // todo: hook state update to change state to replay
+
+        // initialize transition observable
+        const transitionObservable = new Subject();
+
+        const handleReturn = () => {
+            // Transition.out(transitionObservable);
+            this.popMenu();
+            Transition.in(prevScreenTransitionObservable);
+        };
+
+        const handleReplayRequest = (songObject, inputHistory) => {
+
+            this.initPlaybackStateUpdater();
+
+            // tells app to load input history
+            this.props.onReplayBeginRequest(inputHistory);
+
+            this.setState({
+                "selectedSong": songObject,
+                "displayLoadingOverlay": true,
+                "mountLoadingOverlay": true,
+                "replayMode": true
+            });
+
+            Transition.out(transitionObservable);
+
+            // get audio features, emit them to game
+            this.props.spotifyService
+                .getAudioAnalysisAndFeatures(
+                    songObject.id,
+                    object => {
+                        // log
+                        console.log("Features and analysis: ", object);
+
+                        // emit data to game
+                        this.props.gameStateController.request(GameStateEnums.GENERATE, object);
+
+                    }
+                );
+
+            // connect to player
+            this.props.spotifyService.activate();
+
+            // remove all screens but main menu, but don't show it
+            this.mainMenu();
+        };
+
+        // initialize jsx object
+        const songSearchMenu =
+            <SlideTransition
+                transitionRequestObservable={transitionObservable}
+                key={1}
+            >
+                <HUDLeaderboardsMenu
+                    spotifyService={this.props.spotifyService}
+                    onReturn={handleReturn}
+                    onReplayRequest={handleReplayRequest}
+                />
+            </SlideTransition>;
+
+        // mount
+        this.setState(oldState => ({
+            "menuStack": [
+                ...oldState.menuStack,
+                songSearchMenu
+            ]
+        }));
+
+    }
+
     // mounts menu off screen and transitions both menus appropriately
     mountSongSearchMenu(prevScreenTransitionObservable) {
 
@@ -313,7 +422,7 @@ class HUDOverlayManager extends Component {
         };
 
         const handleReturn = () => {
-            Transition.out(transitionObservable);
+            // Transition.out(transitionObservable);
             this.popMenu();
             Transition.in(prevScreenTransitionObservable);
         };
@@ -357,7 +466,8 @@ class HUDOverlayManager extends Component {
 
             this.setState({
                 "displayLoadingOverlay": true,
-                "mountLoadingOverlay": true
+                "mountLoadingOverlay": true,
+                "replayMode": false
             });
 
             Transition.out(transitionObservable);
@@ -382,7 +492,7 @@ class HUDOverlayManager extends Component {
         };
 
         const handleReturn = () => {
-            Transition.out(transitionObservable);
+            // Transition.out(transitionObservable);
             this.popMenu();
             Transition.in(prevScreenTransitionObservable);
         };
@@ -436,7 +546,8 @@ class HUDOverlayManager extends Component {
             displayCompletionForm,
             displayPauseOverlay,
             displayError,
-            displayWelcomeOverlay
+            displayWelcomeOverlay,
+            replayMode
         } = this.state;
 
         const {spotifyService} = this.props;
@@ -453,9 +564,14 @@ class HUDOverlayManager extends Component {
             spotifyService.toggle();
         };
 
+        /*
+         * todo: create replay overlay
+         * todo: account for replay state to avoid pauses as well as completion form
+         */
+
         // prioritize error screen
         if (displayError) return null;
-        else if (displayCompletionForm) return <FormOverlay
+        else if (!replayMode && displayCompletionForm) return <FormOverlay
             zIndex={this.state.menuStack.length}
             onSubmit={respObj => {
                 APIService.submitFeedback({...respObj,
@@ -476,11 +592,12 @@ class HUDOverlayManager extends Component {
             }}
         />;
         // callbacks
-        else if (displayPauseOverlay) return <PauseOverlay
+        else if (!replayMode && displayPauseOverlay) return <PauseOverlay
             isPlaying={this.state.playing}
             onPause={handlePause}
             onResume={handleResume}
         />;
+        else if (replayMode && displayPauseOverlay) return <h1>REPLAY OVERLAY PLACEHOLDER</h1>;
         else if (displayWelcomeOverlay) return <MessageOverlay
             buttonText="Let's Go!"
             onButtonClick={() => this.setState({"displayWelcomeOverlay": false})}
@@ -593,7 +710,10 @@ HUDOverlayManager.propTypes = {
     "onGameResume": PropTypes.func.isRequired,
     "onGameStart": PropTypes.func.isRequired,
     "onGameFinish": PropTypes.func.isRequired,
-    "onGameInterrupted": PropTypes.func.isRequired
+    "onGameInterrupted": PropTypes.func.isRequired,
+    "onReplayBeginRequest": PropTypes.func.isRequired,
+    "onReplayPlaybackStart": PropTypes.func.isRequired,
+    "onReplayInterruptRequest": PropTypes.func.isRequired
 };
 
 // do not run game if hasLoggedIn is not passed in
