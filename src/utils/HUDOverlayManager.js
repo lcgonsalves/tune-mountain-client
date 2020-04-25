@@ -75,7 +75,7 @@ class HUDOverlayManager extends Component {
 
         props.gameStateController.onNotificationOf(
                 GameStateEnums.SCORE_CHANGED,
-            ({body}) => this.setState({"score": body})
+            ({body}) => this.setState({"score": body.score})
         );
 
         // handle spotify player change reactively
