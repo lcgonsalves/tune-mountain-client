@@ -192,13 +192,20 @@ class APIService {
      */
     static fetchLeaderboard(userID = null) {
 
-        const url = `/api/leaderboard${userID ? `/${userID}` : ""}`;
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+        headers.append("X-Game-Version", String(process.env.REACT_APP_VERSION));
 
-        // todo: filter by version
+        const url = `/api/leaderboard${userID ? `/${userID}` : ""}`;
+        const init = {
+            "method": "GET",
+            "mode": "cors",
+            "headers": headers
+        };
 
         const handler = (resolve, reject) => {
 
-            fetch(url)
+            fetch(url, init)
                 .then(response => response.json())
                 .then(responseJSON => responseJSON.status === "success"
                     ? resolve(responseJSON)
