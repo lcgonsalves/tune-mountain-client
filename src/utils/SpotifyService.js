@@ -402,7 +402,7 @@ class SpotifyService {
 				.then(resJSON => resolve({
 					"spotifyID": resJSON.id,
 					"displayName": resJSON.display_name,
-					"imageUrl": resJSON.images[0].url
+					"imageUrl": resJSON.images[0] ? resJSON.images[0].url : "http://icons.iconarchive.com/icons/papirus-team/papirus-status/128/avatar-default-icon.png"
 				}))
 				.catch(err => reject(err));
 
