@@ -31,10 +31,10 @@ Controls.propTypes = {
 Controls.defaultProps = {
     "controlMap": {
         "Spacebar": "Jump",
-        "W": "Trick 1",
-        "A": "Trick 2",
-        "S": "Trick 3",
-        "D": "Trick 4"
+        "W": "Tail Grab",
+        "A": "360",
+        "S": "Front Foot",
+        "D": "Back Foot"
     },
     "highlight": false
 };

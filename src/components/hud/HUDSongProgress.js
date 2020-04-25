@@ -10,7 +10,8 @@ const HUDSongProgress = props => {
         songObject,
         positionInMilliseconds,
         shouldDisplay,
-        score
+        score,
+        multiplier
     } = props;
 
     if (!songObject) return null;
@@ -52,7 +53,7 @@ const HUDSongProgress = props => {
                         id={id}
                         size={"mini"}
                     />
-                    <ScoreContainer score={score ? score : 0} />
+                    <ScoreContainer score={score ? score : 0} multiplier={multiplier ? multiplier : 1} />
             </div>
         </div>
     );
@@ -69,7 +70,8 @@ HUDSongProgress.propTypes = {
     }),
     "positionInMilliseconds": PropTypes.number.isRequired,
     "shouldDisplay": PropTypes.bool.isRequired,
-    "score": PropTypes.number.isRequired
+    "score": PropTypes.number.isRequired,
+    "multiplier": PropTypes.number.isRequired
 };
 
 export default HUDSongProgress;

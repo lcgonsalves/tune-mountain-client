@@ -6,6 +6,7 @@ import {GameStateEnums, GameStateController} from "tune-mountain-input-manager";
 import HUDSongSearchMenu from "../pages/hud/HUDSongSearchMenu";
 import HUDMainMenu from "../pages/hud/HUDMainMenu";
 import HUDSongProgress from "../components/hud/HUDSongProgress";
+import HUDButton, {HUDButtonTypesEnum} from "../components/hud/HUDButton";
 import FadeTransition from "../components/transition/FadeTransition";
 import {Transition} from "./TransitionUtils";
 import SlideTransition from "../components/transition/SlideTransition";
@@ -37,6 +38,7 @@ class HUDOverlayManager extends Component {
             "playing": false,
             "playbackPosition": 0,
             "score": 0,
+            "multiplier": 1,
             "displayCompletionForm": false,
             "displayPauseOverlay": false,
             "displayLoadingOverlay": false,
@@ -75,7 +77,10 @@ class HUDOverlayManager extends Component {
 
         props.gameStateController.onNotificationOf(
                 GameStateEnums.SCORE_CHANGED,
-            ({body}) => this.setState({"score": body.score})
+            ({body}) => this.setState({
+                "score": body.score,
+                "multiplier": body.multiplier
+            })
         );
 
         // handle spotify player change reactively
@@ -154,24 +159,27 @@ class HUDOverlayManager extends Component {
              */
             else if (paused) {
 
-                // check if at the end of the song
-                if (position === 0) {
+                if (this.state.replayMode) {
+                    // interrupt IM
+                    this.props.onReplayInterruptRequest();
+
+                    // make sure user cannot force Spotify Player to play any tracks
+                    this.props.spotifyService.deactivate();
+
+                    this.setState({
+                        "playing": false,
+                        "displayPauseOverlay": false,
+                        "displayCompletionForm": false
+                    });
+
+                    this.mainMenu(true);
+
+                } else if (position === 0) {
 
                     this.props.gameStateController.request(
                         GameStateEnums.IDLE,
                         {"reason": "end"}
                     );
-
-                    if (this.state.replayMode) {
-                        // interrupt IM
-                        this.props.onReplayInterruptRequest();
-
-                        // make sure user cannot force Spotify Player to play any tracks
-                        this.props.spotifyService.deactivate();
-
-                        this.mainMenu(true);
-
-                    }
 
                     this.setState({
                         "playing": false,
@@ -364,7 +372,7 @@ class HUDOverlayManager extends Component {
                 "replayMode": true
             });
 
-            Transition.out(transitionObservable);
+            // Transition.out(transitionObservable);
 
             // get audio features, emit them to game
             this.props.spotifyService
@@ -534,6 +542,10 @@ class HUDOverlayManager extends Component {
 
     // unmounts all menus except first
     mainMenu(show = false) {
+        // todo: remove this once Game properly accounts for its pointers
+        // eslint-disable-next-line
+        if (show) location.reload();
+
         // eslint-disable-next-line no-unused-vars
         const showMenu = show ? Transition.in(this.mainMenuTransitionController) : null;
 
@@ -597,7 +609,16 @@ class HUDOverlayManager extends Component {
             onPause={handlePause}
             onResume={handleResume}
         />;
-        else if (replayMode && displayPauseOverlay) return <h1>REPLAY OVERLAY PLACEHOLDER</h1>;
+        else if (replayMode && displayPauseOverlay) return <HUDButton
+            onClick={handleResume}
+            className={"play-pause-btn"}
+            text="Cancel"
+            style={{
+                "zIndex": 10,
+                "top": "1vh",
+                "right": "2vh"
+            }}
+        />;
         else if (displayWelcomeOverlay) return <MessageOverlay
             buttonText="Let's Go!"
             onButtonClick={() => this.setState({"displayWelcomeOverlay": false})}
@@ -681,6 +702,7 @@ class HUDOverlayManager extends Component {
             positionInMilliseconds={this.state.playbackPosition}
             shouldDisplay={this.state.playing}
             score={this.state.score}
+            multiplier={this.state.multiplier}
         />;
 
         return(
