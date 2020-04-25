@@ -1,5 +1,6 @@
 import React, {Component} from "react";
 import PropTypes from "prop-types";
+import returnIcon from "../../img/return.png";
 import "../../css/hud/HUDButton.css";
 
 /**
@@ -25,29 +26,10 @@ const TypeToClassMap = Object.freeze({
 });
 
 const TypeToStyleMap = Object.freeze({ // todo: pull this out onto css document
-    "SMALL": {
-        "borderBottom": "solid 4px",
-        "borderLeft": "solid 4px",
-        "marginTop": "1.5vw",
-        "height": "5vw"
-    },
-    "RETURN": {
-        "width": "7.8vh",
-        "height": "7vh",
-        "borderBottom": "solid 4px",
-        "borderLeft": "solid 4px"
-    },
-    "ENTER": {
-        "height": "3vw",
-        "borderBottom": "solid 4px",
-        "borderLeft": "solid 4px"
-    },
-    "SPOTIFY": {
-        "borderBottom": "solid 4px",
-        "borderLeft": "solid 4px",
-        "marginTop": "1.5vw",
-        "height": "5vw"
-    }
+    "SMALL": "hud-button-small-pressed",
+    "RETURN": "hud-button-return-pressed",
+    "ENTER": "hud-button-enter-pressed",
+    "SPOTIFY": "hud-button-small-pressed"
 });
 
 /**
@@ -91,6 +73,12 @@ class HUDButton extends Component {
         // check if passed type exists
         const isValidType = Boolean(HUDButtonTypesEnum[type]);
         const filteredType = isValidType ? TypeToClassMap[type] : TypeToClassMap.SMALL;
+        const buttonContent = () => {
+            if (type === HUDButtonTypesEnum.RETURN) return <img src={returnIcon} alt="return icon"/>;
+            else if (text) return String(text).toLowerCase();
+
+            return children;
+        };
 
         const onHover = () => this.setState({"isHovering": !disabled && true});
         const onHoverEnd = () => this.setState({"isHovering": false});
@@ -98,14 +86,14 @@ class HUDButton extends Component {
         // return jsx
         return (
             <div onMouseEnter={onHover}
+                 onMouseOver={onHover}
                  onMouseLeave={onHoverEnd}
                  className={`button-wrapper ${className}`}
                  style={style}
             >
                 <button
                     ref={this.btnRef}
-                    style={isHovering ? TypeToStyleMap[type] : null}
-                    className={`hud-button ${filteredType}`}
+                    className={`hud-button ${filteredType} ${isHovering ? `${TypeToStyleMap[type]} pressed` : ""}`}
                     disabled={disabled}
                     onClick={(event => {
                         this.btnRef.current.blur();
@@ -113,7 +101,7 @@ class HUDButton extends Component {
                         onClick(event);
                     })}
                 >
-                    {text || children}
+                    {buttonContent()}
                 </button>
             </div>
         );

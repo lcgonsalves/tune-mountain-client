@@ -1,9 +1,9 @@
 .score-container {
     display: flex;
     align-items: center;
-    border-color: darkred;
-    background-color: rgba(217, 87, 99, 0.7);
-    border-left: 10px inset red;
+    border-color: rgb(32, 109, 217);
+    background-color: rgb(32, 109, 217);
+    border-left: 10px inset blue;
     border-bottom: 10px solid;
     height: 7vh;
     width: fit-content;

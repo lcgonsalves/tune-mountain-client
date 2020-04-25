@@ -1,9 +1,9 @@
 .hud-song-select-outer-container {
-    height: 100%;
+    height: 70%;
     width: 60%;
-    margin: 0 auto;
+    margin: 18vh auto;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
 }

@@ -283,9 +283,16 @@ class HUDOverlayManager extends Component {
         });
 
         // show welcome in a couple seconds if appropriate
-        if (!this.props.hasLoggedIn) setTimeout(() => this.setState({
-            "displayWelcomeOverlay": true
-        }), 1500);
+        if (!localStorage.getItem("welcome")) setTimeout(() => {
+            // set state if never accessed
+            this.setState({
+                "displayWelcomeOverlay": true
+            });
+
+            // set welcome to true
+            localStorage.setItem("welcome", "true");
+
+        }, 1500);
 
     }
 
@@ -703,6 +710,7 @@ class HUDOverlayManager extends Component {
             shouldDisplay={this.state.playing}
             score={this.state.score}
             multiplier={this.state.multiplier}
+            replayMode={this.state.replayMode}
         />;
 
         return(

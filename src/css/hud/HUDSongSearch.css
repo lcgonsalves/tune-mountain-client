@@ -12,7 +12,10 @@
 
 .song-list-container {
     height: 85%;
-    overflow: scroll;
+    overflow-y: auto;
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
 }
 
 .search-bar-container {
@@ -49,9 +52,9 @@ input::placeholder {
 }
 
 input:focus {
-    border-color: darkred;
+    border-color: #05208b;
 }
 
 input:hover {
-    border-color: rgba(139, 0, 0, 0.4);
+    border-color: rgba(5, 32, 139, 0.4);
 }

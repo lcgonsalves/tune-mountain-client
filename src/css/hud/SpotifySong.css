@@ -1,6 +1,6 @@
 .song-container-small {
-    height: 18%;
-    width: 80%;
+    height: 8vh;
+    width: 60%;
     transition: all 0.3s;
     margin: 0 auto 0.8vw auto;
     cursor: pointer;
@@ -10,9 +10,8 @@
     align-items: center;
     justify-content: left;
 
-    border-color: darkred;
-    background-color: rgba(217, 87, 99, 0.3);
-    border-left: 10px inset red;
+    background-color: rgba(126, 126, 126, 0.9);
+    border-left: 10px inset;
     border-bottom: 10px solid;
 }
 
@@ -28,20 +27,19 @@
     align-items: center;
     justify-content: left;
 
-    border-color: darkred;
-    background-color: rgba(217, 87, 99, 0.7);
-    border-left: 10px inset red;
+    background-color: rgba(126, 126, 126, 0.9);
+    border-left: 10px inset;
     border-bottom: 10px solid;
 }
 
 .song-container-mini .song-data-container .song-name {
-    font-size: 1.4vw;
+    font-size: 1.8vh;
     white-space: nowrap;
     margin-block-end: 0.4vw;
 }
 
 .song-container-mini .song-data-container .song-artist {
-    font-size: 0.9vw;
+    font-size: 0.9vh;
     white-space: nowrap;
     margin-block-start: 0;
 }
@@ -54,22 +52,38 @@
     align-items: center;
     padding: 0 8vw 0 2vw;
 
-    border-color: darkred;
-    background-color: rgba(217, 87, 99, 1);
-    border-left: 10px inset red;
+    background-color: rgba(126, 126, 126, 0.9);
+    border-left: 10px inset;
     border-bottom: 10px solid;
 }
 
+.song-container-large .song-data-container .song-name {
+    font-size: 3vh;
+    height: fit-content;
+    white-space: nowrap;
+    margin-block-end: 0.4vw;
+}
+
+.song-container-large .song-data-container .song-artist {
+    font-size: 2.1vh;
+    white-space: nowrap;
+    margin-block-start: 0;
+    color: #2f2f2f;
+}
+
 .song-container-small:hover {
-    background-color: rgba(217, 87, 99, 1);
+    background-color: rgb(32, 109, 217);
+    border-left: 4px solid;
+    border-bottom: 4px solid;
 }
 
 /* It's important that all of these elements here can be
  * applied to other versions of the song container
  */
 .song-data-container {
-    height: 80%;
+    height: 65%;
     margin-left: 1.5vw;
+    font-family: "Bebas Neue", sans-serif;
 }
 
 .song-image {
@@ -79,11 +93,17 @@
 }
 
 .song-name {
-    font-size: 1.8vw;
+    font-size: 2.1vh;
     white-space: nowrap;
+    margin: 0;
+    height: 60%;
+    color: #000000;
 }
 
 .song-artist {
-    font-size: 1.2vw;
+    font-family: Roboto, sans-serif !important;
+    font-size: 1.2vh;
     white-space: nowrap;
+    margin: 0;
+    color: #1b1b1b;
 }

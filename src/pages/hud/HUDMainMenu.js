@@ -35,6 +35,7 @@ const HUDMainMenu = props => {
     const aboutButton = <HUDButton
         text="About"
         onClick={onAboutPageRequest}
+        disabled={true}
     />;
 
     const leaderboardsButton = <HUDButton
@@ -50,8 +51,8 @@ const HUDMainMenu = props => {
         <div className="hud-main-menu-outer-container">
             <div className="hud-main-menu-button-container">
                 {mainButton}
-                {null /* aboutButton */}
                 {leaderboardsButton}
+                {aboutButton}
             </div>
         </div>
 

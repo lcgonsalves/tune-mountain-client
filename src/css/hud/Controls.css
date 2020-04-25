@@ -14,11 +14,11 @@
 
 .control-display-wrapper h1 {
     font-size: 1.4em;
-    color: #521723;
+    color: #ffffff;
 }
 
 .control-display-wrapper strong {
-    color: #d93b56;
+    color: #62b1f9;
 }
 
 .control-display-wrapper h3 {
@@ -29,7 +29,7 @@
 }
 
 .highlight {
-    background-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(51, 51, 51, 0.8);
 }
 
 .hide {

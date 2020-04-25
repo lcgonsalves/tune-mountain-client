@@ -50,7 +50,7 @@ const SpotifySong = props => {
         })}>
             <img className="song-image" src={imgURL} alt={`Album cover for song ${name} by artist ${artist}`}/>
             <div className="song-data-container">
-                <h1 className="song-name">{trimEnd(name)}</h1>
+                <h1 className="song-name">{trimEnd(name, 36)}</h1>
                 <h2 className="song-artist">{trimEnd(renderArtistArray(artist))}</h2>
             </div>
         </div>

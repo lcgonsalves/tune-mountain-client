@@ -2,8 +2,8 @@ import React from "react";
 import HUDButton from "./HUDButton";
 import pauseIcon from "../../img/pause.png";
 import playIcon from "../../img/play.png";
-import "../../css/hud/PauseOverlay.css";
 import Controls from "./Controls";
+import "../../css/hud/PauseOverlay.css";
 
 const PauseOverlay = props => {
 
