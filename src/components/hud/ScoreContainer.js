@@ -11,7 +11,7 @@ const ScoreContainer = props => {
     }
 
     return <div className="score-container">
-                <h2>Score: </h2><h1>{props.score}</h1><h1>x{props.multiplier}</h1>
+                <h2>Score: </h2><h1>{props.score}</h1><h2 style={{"marginLeft": "10px"}}>x{props.multiplier}</h2>
             </div>;
 
 };

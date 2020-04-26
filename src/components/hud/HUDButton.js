@@ -75,7 +75,7 @@ class HUDButton extends Component {
         const filteredType = isValidType ? TypeToClassMap[type] : TypeToClassMap.SMALL;
         const buttonContent = () => {
             if (type === HUDButtonTypesEnum.RETURN) return <img src={returnIcon} alt="return icon"/>;
-            else if (text) return String(text).toLowerCase();
+            else if (text) return String(text).replace(/^./, String(text)[0].toUpperCase());
 
             return children;
         };

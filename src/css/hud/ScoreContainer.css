@@ -8,6 +8,7 @@
     height: 7vh;
     width: fit-content;
     padding: 0 2vw;
+    font-family: "Source Sans Pro", sans-serif;
 }
 
 .score-container h2 {

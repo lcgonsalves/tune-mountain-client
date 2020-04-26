@@ -14,7 +14,7 @@
     height: 85%;
     overflow-y: auto;
     display: flex;
-    justify-content: space-around;
+    justify-content: flex-start;
     flex-direction: column;
 }
 

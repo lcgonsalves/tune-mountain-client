@@ -1,3 +1,7 @@
+table {
+    font-family: "Source Sans Pro", sans-serif;
+}
+
 tr {
     width: 100%;
     border-top: 0.5vh;
@@ -21,8 +25,8 @@ td {
 }
 
 td img {
-    height: 100%;
-    width: auto;
+    height: 32px;
+    width: 32px;
     border-radius: 50%;
 }
 
@@ -38,6 +42,7 @@ td img {
 .session-song-name, .header-song-name {
     text-align: left;
     width: 48%;
+    font-weight: bold;
 }
 
 .session-score {

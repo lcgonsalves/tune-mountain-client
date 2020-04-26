@@ -83,7 +83,7 @@
 .song-data-container {
     height: 65%;
     margin-left: 1.5vw;
-    font-family: "Bebas Neue", sans-serif;
+    font-family: "Source Sans Pro", sans-serif;
 }
 
 .song-image {
@@ -93,7 +93,7 @@
 }
 
 .song-name {
-    font-size: 2.1vh;
+    font-size: 2vh;
     white-space: nowrap;
     margin: 0;
     height: 60%;
