@@ -50,8 +50,11 @@
 }
 
 .hud-button-return img {
-    height: 60%;
+    height: 70%;
     width: auto;
+    position: absolute;
+    top: 15%;
+    left: 15%;
 }
 
 .hud-button-return-pressed {
