@@ -22,8 +22,12 @@ class HUDLeaderboardsMenu extends Component {
     componentDidMount() {
 
         APIService.fetchLeaderboard()
-            .then(({sessions}) => sessions.forEach((session, index) => {
-                this.makeComplexSession(session, index);
+            .then(({sessions}) => sessions.map((session, index) => {
+                return this.makeComplexSession(session, index);
+            }))
+            .then(promiseArr => Promise.all(promiseArr))
+            .then(complexSessionArr => this.setState({
+                "sessions": complexSessionArr
             }));
 
     }
@@ -52,7 +56,7 @@ class HUDLeaderboardsMenu extends Component {
         const songInfoPromise = spotifyService.getSongInfo(songID);
 
         // promise.all it and resolve it into a song object, session object, and rank.
-        Promise.all([userInfoPromise, songInfoPromise])
+        return Promise.all([userInfoPromise, songInfoPromise])
             .then(([userObject, songObject]) => {
                 const output = {
                     "rank": index + 1,
@@ -66,12 +70,7 @@ class HUDLeaderboardsMenu extends Component {
                     songObject
                 };
 
-                this.setState(oldState => ({
-                    "sessions": [
-                        ...oldState.sessions,
-                        output
-                    ]
-                }));
+                return new Promise(resolve => resolve(output));
             });
 
     }
