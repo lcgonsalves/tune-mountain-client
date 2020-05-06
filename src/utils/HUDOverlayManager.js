@@ -45,6 +45,7 @@ class HUDOverlayManager extends Component {
             "mountLoadingOverlay": false,
             "displayWelcomeOverlay": false,
             "displayNewPlayerOverlay": false,
+            "displayAboutOverlay": false,
             "displayError": false,
             "replayMode": false,
             "menuStack": []
@@ -277,6 +278,7 @@ class HUDOverlayManager extends Component {
                         hasLoggedIn={true}
                         onSongSelectRequest={handleSongSelectRequest}
                         onLeaderboardsPageRequest={handleLeaderboardsRequest}
+                        onAboutPageRequest={() => this.setState({"displayAboutOverlay": true})}
                     />
                 </FadeTransition>
             ]
@@ -566,6 +568,7 @@ class HUDOverlayManager extends Component {
             displayPauseOverlay,
             displayError,
             displayWelcomeOverlay,
+            displayAboutOverlay,
             replayMode
         } = this.state;
 
@@ -582,6 +585,10 @@ class HUDOverlayManager extends Component {
         const handleResume = () => {
             spotifyService.toggle();
         };
+
+        const hideAbout = () => this.setState({
+            "displayAboutOverlay": false
+        });
 
         /*
          * todo: create replay overlay
@@ -630,11 +637,21 @@ class HUDOverlayManager extends Component {
             buttonText="Let's Go!"
             onButtonClick={() => this.setState({"displayWelcomeOverlay": false})}
             title="Welcome to Tune Mountain!"
-            subtitle="An audio-visualizer by Léo, Cem, Jarod, and Peter"
+            subtitle="An audio-visualizer by Léo, Cem, and Jarod, with art by Peter, Joy, and Ali."
         >
             <p>Welcome to Tune Mountain. To play this game <strong>you need</strong> a Spotify premium account, so we could play the song of your choosing. After you log in click <strong>Select Song</strong> to choose any song from Spotify*, and the game will generate a unique mountain experience for you to snowboard down on. </p>
             <p>Game controls can be viewed on the pause menu.</p>
             <p>*The song has to go through the spotify audio feature analysis, so not every song might be available.</p>
+        </MessageOverlay>;
+        else if (displayAboutOverlay) return <MessageOverlay
+            buttonText={"Go back"}
+            onButtonClick={hideAbout}
+            title={"About Tune Mountain"}
+            subtitle={"An audio-visualizer MQP by Léo, Cem, and Jarod, with art by Peter, Joy, and Ali."}
+        >
+            <p>Tune Mountain is a snowboarding game with procedurally-generated mountain courses. Using Spotify’s Web API to obtain structural metadata of a song chosen by the player, we calculate a downhill slope conformed to the “shape” of the song, and allow the player to navigate this slope in a physics-driven simulation while listening to the associated music. Players accumulate points by successfully completing tricks and collecting snowballs, and are able to compare high scores on a leaderboard, as well as view replays of their sessions.</p>
+            <p>You can find our source code for the web app <a href="https://github.com/lcgonsalves/tune-mountain-client" rel="noopener noreferrer" target="_blank">here!</a></p>
+            <p>Follow these links to find out more about the authors of this project: <a href="https://www.leogons.com/about" rel="noopener noreferrer" target="_blank">Leo Gonsalves</a>, <a href="https://github.com/calemdar" rel="noopener noreferrer" target="_blank">Cem Alemdar</a>, <a href="https://github.com/jsthompson16" rel="noopener noreferrer" target="_blank">Jarod Thompson</a>.</p>
         </MessageOverlay>;
         // callbacks for fading it out
 
@@ -669,6 +686,10 @@ class HUDOverlayManager extends Component {
 
     render() {
 
+        const showAbout = () => this.setState({
+            "displayAboutOverlay": true
+        });
+
         // if user has not logged in yet, display incomplete main menu as the only object on screen
         const mainComponent = () => {
             if (!this.props.hasLoggedIn) {
@@ -692,6 +713,7 @@ class HUDOverlayManager extends Component {
                             <HUDMainMenu
                                 onLoginRequest={this.props.spotifyService.login}
                                 hasLoggedIn={false}
+                                onAboutPageRequest={showAbout}
                             />
                         </FadeTransition>
                     </div>

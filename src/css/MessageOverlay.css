@@ -34,3 +34,13 @@
     color: #9a9a9a;
     font-size: 14pt;
 }
+
+.message-overlay-body-container a {
+    color: #206dd9;
+    font-size: 14pt;
+}
+
+.message-overlay-body-container a:hover {
+    color: #5eaeff;
+    font-size: 14pt;
+}
